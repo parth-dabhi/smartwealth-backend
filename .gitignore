@@ -1,35 +1,18 @@
-HELP.md
+# Build & Dependency Folders
 target/
+build/
+
+# Maven Wrapper Files
 .mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+.mvn/wrapper/maven-wrapper.properties
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# IntelliJ IDEA
+.idea/
 *.iml
+*.iws
 *.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# VS Code
 .vscode/
 
 # Java
@@ -38,23 +21,22 @@ build/
 *.war
 *.ear
 
-# Maven
-/target/
-
-# IntelliJ
-.idea/
-
 # Logs
 *.log
 
-# OS
+# OS Files
 .DS_Store
 Thumbs.db
 
-# Env files
+# Environment / Secrets
 .env
 *.env
-
-# Spring Boot
 application-local.yml
 application-secrets.yml
+
+# Spring Boot
+/logs/
+/tmp/
+
+# Docker
+/docker-data/
