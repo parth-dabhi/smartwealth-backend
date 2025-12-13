@@ -5,14 +5,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/radha")
-public class ShriHarivanshController {
+@RequestMapping("/api/users")
+public class UserController {
 
-    @GetMapping
-    public List<String> radha() {
-        return new ArrayList<>(List.of("Radha Radha - Shri Harivansh!"));
+    @GetMapping("/all")
+    public List<String> getAllUsers() {
+        // Placeholder implementation
+        return new ArrayList<>(Collections.singleton("User"));
     }
 }

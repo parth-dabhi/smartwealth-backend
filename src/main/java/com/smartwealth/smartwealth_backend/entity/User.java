@@ -40,18 +40,22 @@ public class User {
     @Column(name="full_name", nullable=false, length=100)
     private String fullName;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role = UserRole.USER;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name="kyc_status", nullable=false)
     private KycStatus kycStatus = KycStatus.PENDING;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name="risk_profile", nullable=false)
     private RiskProfile riskProfile = RiskProfile.MODERATE;
 
+    @Builder.Default
     @Column(name="is_active", nullable=false)
     private boolean isActive = true;
 

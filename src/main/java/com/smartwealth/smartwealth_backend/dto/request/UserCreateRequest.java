@@ -1,0 +1,33 @@
+package com.smartwealth.smartwealth_backend.dto.request;
+
+import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserCreateRequest {
+
+    @NotBlank
+    @Email(message = "Enter valid email")
+    String email;
+
+    @Pattern(regexp = "^\\d{10}$", message = "Mobile number must have exactly 10 digits")
+    String mobileNumber;
+
+    @NotBlank
+    @Size(min=3, max=100, message = "Full name must be between 3 and 100 characters")
+    String fullName;
+
+    @NotBlank
+    @Size(min=8, max=15, message = "Password must be between 8 and 15 characters")
+    String password;
+
+//    RiskProfile riskProfile;  // optional: "MODERATE"
+}
