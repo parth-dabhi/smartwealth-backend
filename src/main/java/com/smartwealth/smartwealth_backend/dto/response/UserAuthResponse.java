@@ -5,20 +5,21 @@ import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import lombok.*;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponse {
+public class UserAuthResponse {
     private String customerId;
     private String email;
     private String mobileNumber;
     private String fullName;
-
-    private UserRole role; // role of the user
+    private UserRole role;
     private KycStatus kycStatus;
     private RiskProfile riskProfile;
-
     private boolean isActive;
+    private Instant lastLoginAt;
 }

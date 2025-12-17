@@ -1,14 +1,13 @@
 package com.smartwealth.smartwealth_backend.service;
 
 import com.smartwealth.smartwealth_backend.dto.request.UserCreateRequest;
-import com.smartwealth.smartwealth_backend.dto.response.UserResponse;
-import com.smartwealth.smartwealth_backend.entity.User;
+import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
 
 import java.util.Optional;
 
 public interface UserService {
 
-    Optional<UserResponse> createUser(UserCreateRequest request);
-    Optional<UserResponse> getUserByCustomerId(String customerId);
-    Optional<UserResponse> getUserByEmail(String email);
+    Optional<UserAuthResponse> createUser(UserCreateRequest request);
+    Optional<UserAuthResponse> getUserByCustomerId(String customerId);
+    Optional<UserAuthResponse> getUserByEmail(String email);
 }

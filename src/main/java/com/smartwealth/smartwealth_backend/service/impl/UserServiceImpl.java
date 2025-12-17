@@ -2,7 +2,7 @@ package com.smartwealth.smartwealth_backend.service.impl;
 
 import com.smartwealth.smartwealth_backend.dto.mapper.UserMapper;
 import com.smartwealth.smartwealth_backend.dto.request.UserCreateRequest;
-import com.smartwealth.smartwealth_backend.dto.response.UserResponse;
+import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
 import com.smartwealth.smartwealth_backend.entity.User;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
             isolation = Isolation.READ_COMMITTED, // Prevents dirty reads, Other levels are overkill.
             label = "USER_CREATE_OPERATION"
     )
-    public Optional<UserResponse> createUser(UserCreateRequest request) {
+    public Optional<UserAuthResponse> createUser(UserCreateRequest request) {
         log.info("Creating new user with email: {}", request.getEmail());
         validateDuplicateUser(request);
         User user = UserMapper.toEntity(request);
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true, label = "FETCH_USER_BY_ID")
-    public Optional<UserResponse> getUserByCustomerId(String customerId) {
+    public Optional<UserAuthResponse> getUserByCustomerId(String customerId) {
         log.info("Fetching user by customerId={}", customerId);
         User user = userRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found-Invalid Customer id"));
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true, label = "FETCH_USER_BY_EMAIL")
-    public Optional<UserResponse> getUserByEmail(String email) {
+    public Optional<UserAuthResponse> getUserByEmail(String email) {
         log.info("Fetching user by email={}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));

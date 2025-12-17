@@ -1,7 +1,7 @@
 package com.smartwealth.smartwealth_backend.dto.mapper;
 
 import com.smartwealth.smartwealth_backend.dto.request.UserCreateRequest;
-import com.smartwealth.smartwealth_backend.dto.response.UserResponse;
+import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
 import com.smartwealth.smartwealth_backend.entity.User;
 
 public class UserMapper {
@@ -15,8 +15,8 @@ public class UserMapper {
                 .build();
     }
 
-    public static UserResponse toResponse(User user) {
-        return UserResponse.builder()
+    public static UserAuthResponse toResponse(User user) {
+        return UserAuthResponse.builder()
                 .customerId(user.getCustomerId())
                 .email(user.getEmail())
                 .mobileNumber(user.getMobileNumber())

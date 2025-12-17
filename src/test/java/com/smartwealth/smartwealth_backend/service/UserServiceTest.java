@@ -1,7 +1,7 @@
 package com.smartwealth.smartwealth_backend.service;
 
 import com.smartwealth.smartwealth_backend.dto.request.UserCreateRequest;
-import com.smartwealth.smartwealth_backend.dto.response.UserResponse;
+import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +26,7 @@ public class UserServiceTest {
                 .build();
 
         // WHEN
-        UserResponse response = userService.createUser(dto).get();
+        UserAuthResponse response = userService.createUser(dto).get();
 
         // THEN
         assertThat(response).isNotNull();

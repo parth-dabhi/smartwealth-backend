@@ -18,6 +18,15 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+jwt:
+  secret:
+    access: ${JWT_ACCESS_SECRET}
+    refresh: ${JWT_REFRESH_SECRET}
+  expiry:
+    access: ${JWT_ACCESS_EXPIRY}
+    refresh: ${JWT_REFRESH_EXPIRY}
+
+
 #logging:
 #  level:
 #    org.flywaydb: DEBUG
