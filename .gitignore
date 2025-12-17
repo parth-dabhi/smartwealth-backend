@@ -41,3 +41,6 @@ application-secrets.yml
 
 # Docker
 /docker-data/
+
+# Others
+desktop.ini

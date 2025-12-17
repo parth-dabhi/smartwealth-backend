@@ -28,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    @Transactional(readOnly = true, timeout = 5)
+    @Transactional(timeout = 5)
     public AuthResponse login(UserLoginRequest request) {
 
         log.info("Attempting login for customerId={}", request.getCustomerId());
@@ -56,14 +56,18 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Login successful for customerId={}", user.getCustomerId());
 
+        Instant previousLoginAt = user.getLastLoginAt();
+
         user.setLastLoginAt(Instant.now());
-        userRepository.save(user);
+        userRepository.save(user); // Update last login time to DB
+
+        log.info("Updated lastLoginAt for customerId={}", user.getCustomerId());
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .expiresIn(jwtTokenProvider.getAccessTokenExpiry())
-                .user(buildUserAuthResponse(user))
+                .user(buildUserAuthResponse(user, previousLoginAt))
                 .build();
     }
 
@@ -81,6 +85,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new AuthenticationException("Invalid refresh token"));
 
+        log.info("Refresh token successful for customerId={}", user.getCustomerId());
+
         return RefreshTokenResponse.builder()
                 .accessToken(
                         jwtTokenProvider.generateAccessToken(
@@ -94,7 +100,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    private UserAuthResponse buildUserAuthResponse(User user) {
+    private UserAuthResponse buildUserAuthResponse(User user, Instant lastLoginAt) {
         return UserAuthResponse.builder()
                 .customerId(user.getCustomerId())
                 .fullName(user.getFullName())
@@ -104,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
                 .kycStatus(user.getKycStatus())
                 .riskProfile(user.getRiskProfile())
                 .isActive(user.isActive())
-                .lastLoginAt(user.getLastLoginAt())
+                .lastLoginAt(lastLoginAt)
                 .build();
     }
 }

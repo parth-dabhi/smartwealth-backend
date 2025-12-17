@@ -1,20 +1,34 @@
 package com.smartwealth.smartwealth_backend.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.smartwealth.smartwealth_backend.dto.request.UserCreateRequest;
+import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
+import com.smartwealth.smartwealth_backend.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
-    @GetMapping("/all")
-    public List<String> getAllUsers() {
-        // Placeholder implementation
-        return new ArrayList<>(Collections.singleton("User"));
+    private final UserService userService;
+
+    /**
+     * Register a new user in the system.
+     *
+     * @param request user registration request
+     * @return created user details
+     */
+    @PostMapping
+    public ResponseEntity<UserAuthResponse> registerUser(@Valid @RequestBody UserCreateRequest request) {
+        log.info("Received user registration request");
+        UserAuthResponse response = userService.createUser(request)
+                .orElseThrow(() -> new IllegalStateException("User creation failed"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
