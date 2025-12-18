@@ -1,10 +1,12 @@
 package com.smartwealth.smartwealth_backend.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.smartwealth.smartwealth_backend.annotation.Adult;
+import com.smartwealth.smartwealth_backend.entity.enums.Gender;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -29,5 +31,15 @@ public class UserCreateRequest {
     @Size(min=8, max=15, message = "Password must be between 8 and 15 characters")
     String password;
 
-//    RiskProfile riskProfile;  // optional: "MODERATE"
+    @NotNull(message = "Date of birth is required")
+    @Past(message = "Date of birth must be in the past")
+    @Adult
+    private LocalDate dateOfBirth;
+
+    @NotNull(message = "Gender is required")
+    private Gender gender;
+
+    @NotNull(message = "Address is required")
+    @Valid
+    private AddressRequest address;
 }

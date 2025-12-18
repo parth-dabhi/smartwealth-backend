@@ -1,11 +1,13 @@
 package com.smartwealth.smartwealth_backend.dto.response;
 
+import com.smartwealth.smartwealth_backend.entity.enums.Gender;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -17,6 +19,9 @@ public class UserAuthResponse {
     private String email;
     private String mobileNumber;
     private String fullName;
+    private LocalDate dateOfBirth;
+    private Gender gender;
+    private AddressResponse address;
     private UserRole role;
     private KycStatus kycStatus;
     private RiskProfile riskProfile;
