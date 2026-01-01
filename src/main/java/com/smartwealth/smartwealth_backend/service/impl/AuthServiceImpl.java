@@ -39,6 +39,9 @@ public class AuthServiceImpl implements AuthService {
                     return new AuthenticationException("Invalid customer ID or password");
                 });
 
+        // TODO: Rate limiting to prevent brute-force attacks
+        // TODO: Implement account lockout after multiple failed attempts -  max 3 attempts
+
         // Correct password check
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             log.warn("Login failed: incorrect password for customerId={}", request.getCustomerId());

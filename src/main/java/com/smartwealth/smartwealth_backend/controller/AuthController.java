@@ -5,6 +5,7 @@ import com.smartwealth.smartwealth_backend.dto.request.UserLoginRequest;
 import com.smartwealth.smartwealth_backend.dto.response.AuthResponse;
 import com.smartwealth.smartwealth_backend.dto.response.RefreshTokenResponse;
 import com.smartwealth.smartwealth_backend.service.AuthService;
+import com.smartwealth.smartwealth_backend.api.ApiPaths;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(ApiPaths.API_AUTH)
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
@@ -29,7 +30,7 @@ public class AuthController {
      * Authenticates user using customerId + password
      */
 
-    @PostMapping("/login")
+    @PostMapping(ApiPaths.AUTH_LOGIN)
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody UserLoginRequest request) {
         log.info("Received login request for customerId={}", request.getCustomerId());
         AuthResponse response = authService.login(request);
@@ -43,7 +44,7 @@ public class AuthController {
      * Public endpoint
      * Issues new access token using valid refresh token
      */
-    @PostMapping("/refresh")
+    @PostMapping(ApiPaths.AUTH_REFRESH)
     public ResponseEntity<RefreshTokenResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         log.info("Received refresh token request");
         RefreshTokenResponse response = authService.refreshToken(request);

@@ -7,12 +7,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
+import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
@@ -78,6 +80,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
         log.warn("Malformed JSON request: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request: " + ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<?> handleAuthorizationDenied(AuthorizationDeniedException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("status", 403, "error", "FORBIDDEN", "message", "Access denied", "path", request.getRequestURI()));
+    }
+
+    @ExceptionHandler(KycTransitionException.class)
+    public ResponseEntity<ErrorResponse> handleKycTransitionException(KycTransitionException ex, HttpServletRequest request) {
+        log.warn("Invalid KYC status transition: {}", ex.getMessage());
+
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {

@@ -3,6 +3,7 @@ package com.smartwealth.smartwealth_backend.controller;
 import com.smartwealth.smartwealth_backend.dto.request.UserCreateRequest;
 import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
 import com.smartwealth.smartwealth_backend.service.UserService;
+import com.smartwealth.smartwealth_backend.api.ApiPaths;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(ApiPaths.API_USERS)
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
