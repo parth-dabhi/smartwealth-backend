@@ -6,7 +6,6 @@ import com.smartwealth.smartwealth_backend.dto.response.AdminUserListResponse;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import com.smartwealth.smartwealth_backend.service.AdminUserService;
-import com.smartwealth.smartwealth_backend.service.UserService;
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -23,14 +22,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
-    private final UserService userService;
-
-    /**
-     * Mock KYC verification / update (Admin only).
-     * Allowed transitions:
-     * PENDING -> VERIFIED
-     * PENDING -> REJECTED
-     */
 
     private final AdminUserService adminUserService;
 
@@ -63,6 +54,13 @@ public class AdminController {
         log.info("AdminController: get user detail for customerId={}", customerId);
         return adminUserService.getUserDetail(customerId);
     }
+
+    /**
+     * Mock KYC verification / update (Admin only).
+     * Allowed transitions:
+     * PENDING -> VERIFIED
+     * PENDING -> REJECTED
+     */
 
     @PutMapping(ApiPaths.USER_KYC_UPDATE)
     public ResponseEntity<Void> updateKyc(@PathVariable String customerId, @Valid @RequestBody AdminKycUpdateRequest request) {

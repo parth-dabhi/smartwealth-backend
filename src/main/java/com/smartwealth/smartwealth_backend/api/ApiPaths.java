@@ -14,6 +14,7 @@ public final class ApiPaths {
     public static final String USER_BY_ID = USERS + CUSTOMER_ID;
     public static final String USER_KYC_UPDATE = USER_BY_ID + KYC_STATUS;
     public static final String API_USERS  = API + USERS;
+    public static final String USER_RISK_PROFILE = "/risk-profile";
 
     // Admin
     public static final String ADMIN = "/admin";

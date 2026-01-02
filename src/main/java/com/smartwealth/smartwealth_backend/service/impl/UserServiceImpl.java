@@ -83,4 +83,25 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return Optional.of(UserMapper.toResponse(user));
     }
+
+    @Override
+    @Transactional(timeout = 5)
+    public void updateRiskProfile(String customerId, RiskProfile riskProfile) {
+
+        log.info("Updating risk profile for customerId={}, newRiskProfile={}", customerId, riskProfile);
+
+        User user = userRepository.findByCustomerId(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Idempotent-safe
+        if (user.getRiskProfile() == riskProfile) {
+            log.info("Risk profile already set to {} for customerId={}", riskProfile, customerId);
+            return;
+        }
+
+        user.setRiskProfile(riskProfile);
+        userRepository.save(user);
+
+        log.info("Risk profile updated successfully for customerId={}", customerId);
+    }
 }
