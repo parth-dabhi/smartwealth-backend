@@ -1,7 +1,7 @@
 package com.smartwealth.smartwealth_backend.dto.mapper;
 
-import com.smartwealth.smartwealth_backend.dto.request.AddressRequest;
-import com.smartwealth.smartwealth_backend.dto.response.AddressResponse;
+import com.smartwealth.smartwealth_backend.dto.request.user.AddressRequest;
+import com.smartwealth.smartwealth_backend.dto.response.user.AddressResponse;
 import com.smartwealth.smartwealth_backend.entity.Address;
 
 public class AddressMapper {

@@ -1,7 +1,7 @@
 package com.smartwealth.smartwealth_backend.service;
 
-import com.smartwealth.smartwealth_backend.dto.response.AdminUserDetailResponse;
-import com.smartwealth.smartwealth_backend.dto.response.AdminUserListResponse;
+import com.smartwealth.smartwealth_backend.dto.response.admin.AdminUserDetailResponse;
+import com.smartwealth.smartwealth_backend.dto.response.admin.AdminUserListResponse;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 

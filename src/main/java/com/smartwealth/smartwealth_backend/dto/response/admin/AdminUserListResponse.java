@@ -1,5 +1,6 @@
-package com.smartwealth.smartwealth_backend.dto.response;
+package com.smartwealth.smartwealth_backend.dto.response.admin;
 
+import com.smartwealth.smartwealth_backend.dto.response.common.PageMetaResponse;
 import lombok.Builder;
 import lombok.Getter;
 

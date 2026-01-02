@@ -1,6 +1,6 @@
 package com.smartwealth.smartwealth_backend.exception;
 
-import com.smartwealth.smartwealth_backend.dto.response.ErrorResponse;
+import com.smartwealth.smartwealth_backend.dto.response.common.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;

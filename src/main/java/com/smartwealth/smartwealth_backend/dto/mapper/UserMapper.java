@@ -1,7 +1,7 @@
 package com.smartwealth.smartwealth_backend.dto.mapper;
 
-import com.smartwealth.smartwealth_backend.dto.request.UserCreateRequest;
-import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
+import com.smartwealth.smartwealth_backend.dto.request.user.UserCreateRequest;
+import com.smartwealth.smartwealth_backend.dto.response.auth.UserAuthResponse;
 import com.smartwealth.smartwealth_backend.entity.User;
 
 public class UserMapper {

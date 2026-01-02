@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.dto.request;
+package com.smartwealth.smartwealth_backend.dto.request.admin;
 
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import jakarta.validation.constraints.NotNull;

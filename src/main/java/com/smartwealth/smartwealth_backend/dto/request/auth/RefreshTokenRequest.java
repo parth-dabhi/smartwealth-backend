@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.dto.request;
+package com.smartwealth.smartwealth_backend.dto.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

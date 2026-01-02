@@ -1,10 +1,10 @@
 package com.smartwealth.smartwealth_backend.service.impl;
 
-import com.smartwealth.smartwealth_backend.dto.request.RefreshTokenRequest;
-import com.smartwealth.smartwealth_backend.dto.request.UserLoginRequest;
-import com.smartwealth.smartwealth_backend.dto.response.AuthResponse;
-import com.smartwealth.smartwealth_backend.dto.response.RefreshTokenResponse;
-import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
+import com.smartwealth.smartwealth_backend.dto.request.auth.RefreshTokenRequest;
+import com.smartwealth.smartwealth_backend.dto.request.auth.UserLoginRequest;
+import com.smartwealth.smartwealth_backend.dto.response.auth.AuthResponse;
+import com.smartwealth.smartwealth_backend.dto.response.auth.RefreshTokenResponse;
+import com.smartwealth.smartwealth_backend.dto.response.auth.UserAuthResponse;
 import com.smartwealth.smartwealth_backend.entity.User;
 import com.smartwealth.smartwealth_backend.exception.AuthenticationException;
 import com.smartwealth.smartwealth_backend.repository.UserRepository;

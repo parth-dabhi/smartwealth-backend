@@ -1,8 +1,8 @@
 package com.smartwealth.smartwealth_backend.service.impl;
 
 import com.smartwealth.smartwealth_backend.dto.mapper.UserMapper;
-import com.smartwealth.smartwealth_backend.dto.request.UserCreateRequest;
-import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
+import com.smartwealth.smartwealth_backend.dto.request.user.UserCreateRequest;
+import com.smartwealth.smartwealth_backend.dto.response.auth.UserAuthResponse;
 import com.smartwealth.smartwealth_backend.entity.User;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;

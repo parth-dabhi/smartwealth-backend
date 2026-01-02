@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.dto.request;
+package com.smartwealth.smartwealth_backend.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

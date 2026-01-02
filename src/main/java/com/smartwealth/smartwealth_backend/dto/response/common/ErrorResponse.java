@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.dto.response;
+package com.smartwealth.smartwealth_backend.dto.response.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

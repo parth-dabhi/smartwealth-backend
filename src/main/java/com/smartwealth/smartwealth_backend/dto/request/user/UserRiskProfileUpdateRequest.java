@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.dto.request;
+package com.smartwealth.smartwealth_backend.dto.request.user;
 
 import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import jakarta.validation.constraints.NotNull;

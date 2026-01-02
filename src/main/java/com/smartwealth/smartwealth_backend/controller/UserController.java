@@ -1,8 +1,8 @@
 package com.smartwealth.smartwealth_backend.controller;
 
-import com.smartwealth.smartwealth_backend.dto.request.UserCreateRequest;
-import com.smartwealth.smartwealth_backend.dto.request.UserRiskProfileUpdateRequest;
-import com.smartwealth.smartwealth_backend.dto.response.UserAuthResponse;
+import com.smartwealth.smartwealth_backend.dto.request.user.UserCreateRequest;
+import com.smartwealth.smartwealth_backend.dto.request.user.UserRiskProfileUpdateRequest;
+import com.smartwealth.smartwealth_backend.dto.response.auth.UserAuthResponse;
 import com.smartwealth.smartwealth_backend.service.UserService;
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
 import jakarta.validation.Valid;

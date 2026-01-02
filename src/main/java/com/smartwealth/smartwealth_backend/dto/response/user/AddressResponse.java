@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.dto.response;
+package com.smartwealth.smartwealth_backend.dto.response.user;
 
 import lombok.*;
 

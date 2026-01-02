@@ -1,5 +1,6 @@
-package com.smartwealth.smartwealth_backend.dto.response;
+package com.smartwealth.smartwealth_backend.dto.response.auth;
 
+import com.smartwealth.smartwealth_backend.dto.response.user.AddressResponse;
 import com.smartwealth.smartwealth_backend.entity.enums.Gender;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
