@@ -4,12 +4,14 @@ import com.smartwealth.smartwealth_backend.dto.mapper.UserMapper;
 import com.smartwealth.smartwealth_backend.dto.request.user.UserCreateRequest;
 import com.smartwealth.smartwealth_backend.dto.response.auth.UserAuthResponse;
 import com.smartwealth.smartwealth_backend.entity.User;
+import com.smartwealth.smartwealth_backend.entity.Wallet;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import com.smartwealth.smartwealth_backend.exception.ResourceAlreadyExistsException;
 import com.smartwealth.smartwealth_backend.exception.ResourceNotFoundException;
 import com.smartwealth.smartwealth_backend.repository.UserRepository;
+import com.smartwealth.smartwealth_backend.repository.WalletRepository;
 import com.smartwealth.smartwealth_backend.service.CustomerIdGeneratorService;
 import com.smartwealth.smartwealth_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final WalletRepository walletRepository;
     private final CustomerIdGeneratorService customerIdGenerator;
     private final PasswordEncoder passwordEncoder;
 
@@ -52,9 +55,15 @@ public class UserServiceImpl implements UserService {
         user.setCustomerId(customerIdGenerator.generateCustomerId());
         // Save entity
         User savedUser  = userRepository.save(user);
-
         log.info("User created successfully. customerId={}", savedUser .getCustomerId());
-        return Optional.of(UserMapper.toResponse(savedUser ));
+
+        // Create Wallet for New User
+        log.info("Creating wallet for user customerId={}", savedUser.getCustomerId());
+        Wallet wallet = Wallet.createFor(savedUser);
+        walletRepository.save(wallet);
+        log.info("Wallet created for userId={} walletId={}", savedUser.getId(), wallet.getId());
+
+        return Optional.of(UserMapper.toResponse(savedUser));
     }
 
     private void validateDuplicateUser(UserCreateRequest request) {
