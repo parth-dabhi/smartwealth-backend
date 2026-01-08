@@ -5,6 +5,7 @@ import com.smartwealth.smartwealth_backend.dto.request.auth.UserLoginRequest;
 import com.smartwealth.smartwealth_backend.dto.response.auth.AuthResponse;
 import com.smartwealth.smartwealth_backend.dto.response.auth.RefreshTokenResponse;
 import com.smartwealth.smartwealth_backend.dto.response.auth.UserAuthResponse;
+import com.smartwealth.smartwealth_backend.dto.response.user.AddressResponse;
 import com.smartwealth.smartwealth_backend.entity.User;
 import com.smartwealth.smartwealth_backend.exception.AuthenticationException;
 import com.smartwealth.smartwealth_backend.repository.UserRepository;
@@ -66,12 +67,12 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Updated lastLoginAt for customerId={}", user.getCustomerId());
 
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .expiresIn(jwtTokenProvider.getAccessTokenExpiry())
-                .user(buildUserAuthResponse(user, previousLoginAt))
-                .build();
+        return AuthResponse.fromDetails(
+                accessToken,
+                refreshToken,
+                jwtTokenProvider.getAccessTokenExpiry(),
+                UserAuthResponse.toResponse(user, previousLoginAt)
+        );
     }
 
     @Override
@@ -100,20 +101,6 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(
                         jwtTokenProvider.generateRefreshToken(user.getCustomerId())
                 )
-                .build();
-    }
-
-    private UserAuthResponse buildUserAuthResponse(User user, Instant lastLoginAt) {
-        return UserAuthResponse.builder()
-                .customerId(user.getCustomerId())
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .mobileNumber(user.getMobileNumber())
-                .role(user.getRole())
-                .kycStatus(user.getKycStatus())
-                .riskProfile(user.getRiskProfile())
-                .isActive(user.isActive())
-                .lastLoginAt(lastLoginAt)
                 .build();
     }
 }

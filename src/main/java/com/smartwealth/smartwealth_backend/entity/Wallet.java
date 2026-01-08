@@ -37,7 +37,7 @@ public class Wallet {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
 
-    // Reserved / locked funds (cannot be spent)
+    // Reserved / locked funds (cannot be spent) Simple Balance ≥ Locked Balance
     @Column(name = "locked_balance", nullable = false, precision = 19, scale = 2)
     private BigDecimal lockedBalance;
 

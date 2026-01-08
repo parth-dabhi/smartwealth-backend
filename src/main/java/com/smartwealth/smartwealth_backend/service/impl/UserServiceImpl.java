@@ -1,6 +1,5 @@
 package com.smartwealth.smartwealth_backend.service.impl;
 
-import com.smartwealth.smartwealth_backend.dto.mapper.UserMapper;
 import com.smartwealth.smartwealth_backend.dto.request.user.UserCreateRequest;
 import com.smartwealth.smartwealth_backend.dto.response.auth.UserAuthResponse;
 import com.smartwealth.smartwealth_backend.entity.User;
@@ -43,7 +42,7 @@ public class UserServiceImpl implements UserService {
     public Optional<UserAuthResponse> createUser(UserCreateRequest request) {
         log.info("Creating new user with email: {}", request.getEmail());
         validateDuplicateUser(request);
-        User user = UserMapper.toEntity(request);
+        User user = UserCreateRequest.toEntity(request);
 
         // manually set default values - double safety
         user.setRole(UserRole.USER);
@@ -63,7 +62,7 @@ public class UserServiceImpl implements UserService {
         walletRepository.save(wallet);
         log.info("Wallet created for userId={} walletId={}", savedUser.getId(), wallet.getId());
 
-        return Optional.of(UserMapper.toResponse(savedUser));
+        return Optional.of(UserAuthResponse.toResponse(savedUser, null));
     }
 
     private void validateDuplicateUser(UserCreateRequest request) {
@@ -77,20 +76,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true, label = "FETCH_USER_BY_ID")
-    public Optional<UserAuthResponse> getUserByCustomerId(String customerId) {
+    public User getUserByCustomerId(String customerId) {
         log.info("Fetching user by customerId={}", customerId);
-        User user = userRepository.findByCustomerId(customerId)
+        return userRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found-Invalid Customer id"));
-        return Optional.of(UserMapper.toResponse(user));
     }
 
     @Override
     @Transactional(readOnly = true, label = "FETCH_USER_BY_EMAIL")
-    public Optional<UserAuthResponse> getUserByEmail(String email) {
+    public User getUserByEmail(String email) {
         log.info("Fetching user by email={}", email);
-        User user = userRepository.findByEmail(email)
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return Optional.of(UserMapper.toResponse(user));
     }
 
     @Override

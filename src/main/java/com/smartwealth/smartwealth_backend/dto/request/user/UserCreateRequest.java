@@ -1,6 +1,7 @@
 package com.smartwealth.smartwealth_backend.dto.request.user;
 
 import com.smartwealth.smartwealth_backend.annotation.Adult;
+import com.smartwealth.smartwealth_backend.entity.User;
 import com.smartwealth.smartwealth_backend.entity.enums.Gender;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -42,4 +43,15 @@ public class UserCreateRequest {
     @NotNull(message = "Address is required")
     @Valid
     private AddressRequest address;
+
+    public static User toEntity(UserCreateRequest request) {
+        return User.builder()
+                .email(request.getEmail())
+                .mobileNumber(request.getMobileNumber())
+                .fullName(request.getFullName())
+                .dateOfBirth(request.getDateOfBirth())
+                .gender(request.getGender())
+                .address(AddressRequest.toEntity(request.getAddress()))
+                .build();
+    }
 }

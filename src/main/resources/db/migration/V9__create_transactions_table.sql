@@ -13,6 +13,8 @@ CREATE TABLE transactions
 
     CONSTRAINT uk_tx_idempotency_key
         UNIQUE (idempotency_key),
+    CONSTRAINT uk_tx_reference_id
+        UNIQUE (reference_id),
     CONSTRAINT fk_tx_user
         FOREIGN KEY (user_id)
             REFERENCES users (id),

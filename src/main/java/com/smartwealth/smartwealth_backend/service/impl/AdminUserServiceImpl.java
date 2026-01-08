@@ -132,35 +132,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                         new ResourceNotFoundException("User not found")
                 );
 
-        return AdminUserDetailResponse.builder()
-                .customerId(user.getCustomerId())
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .mobileNumber(user.getMobileNumber())
-                .dateOfBirth(user.getDateOfBirth())
-                .gender(user.getGender())
-                .address(
-                        user.getAddress() == null ? null :
-                                AddressResponse.builder()
-                                        .addressLine1(user.getAddress().getAddressLine1())
-                                        .addressLine2(user.getAddress().getAddressLine2())
-                                        .city(user.getAddress().getCity())
-                                        .state(user.getAddress().getState())
-                                        .country(user.getAddress().getCountry())
-                                        .postalCode(user.getAddress().getPostalCode())
-                                        .build()
-                )
-                .role(user.getRole())
-                .kycStatus(user.getKycStatus())
-                .riskProfile(user.getRiskProfile())
-                .isActive(user.isActive())
-                .createdAt(user.getCreatedAt())
-                .lastLoginAt(user.getLastLoginAt())
-                ._links(Map.of(
-                        "self", ApiPaths.API_ADMIN_USERS  + "/" + customerId,
-                        "list", ApiPaths.API_ADMIN_USERS
-                ))
-                .build();
+        return AdminUserDetailResponse.from(user);
     }
 
     @Override

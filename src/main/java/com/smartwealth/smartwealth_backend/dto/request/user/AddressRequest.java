@@ -1,5 +1,6 @@
 package com.smartwealth.smartwealth_backend.dto.request.user;
 
+import com.smartwealth.smartwealth_backend.entity.Address;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -33,4 +34,15 @@ public class AddressRequest {
     @NotBlank(message = "Postal code is required")
     @Size(min=6, max = 20)
     private String postalCode;
+
+    public static Address toEntity(AddressRequest dto) {
+        return Address.builder()
+                .addressLine1(dto.getAddressLine1())
+                .addressLine2(dto.getAddressLine2())
+                .city(dto.getCity())
+                .state(dto.getState())
+                .country(dto.getCountry())
+                .postalCode(dto.getPostalCode())
+                .build();
+    }
 }
