@@ -1,21 +1,14 @@
 package com.smartwealth.smartwealth_backend.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.smartwealth.smartwealth_backend.entity.enums.TransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
-
 import com.smartwealth.smartwealth_backend.entity.Transaction;
-import com.smartwealth.smartwealth_backend.entity.User;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-
-    /**
-     * Fetch transactions of a user with pagination.
-     * Used for "View Transactions" screens.
-     */
-    Page<Transaction> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
 
     /**
      * Idempotency check.
@@ -24,4 +17,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     Optional<Transaction> findByIdempotencyKey(String idempotencyKey);
 
     boolean existsByIdempotencyKey(String idempotencyKey);
+
+    @Modifying
+    @Query("""
+    UPDATE Transaction t
+    SET t.status = :status,
+        t.description = :description
+    WHERE t.id = :id
+""")
+    int updateStatusAndDescription(
+            @Param("id") Long id,
+            @Param("status") TransactionStatus status,
+            @Param("description") String description
+    );
 }

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(
@@ -50,7 +51,7 @@ public class Transaction {
     private TransactionType transactionType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10, updatable = false)
+    @Column(nullable = false, length = 10, updatable = true)
     private TransactionStatus status;
 
     @Column(nullable = false, precision = 19, scale = 2, updatable = false)
@@ -68,19 +69,45 @@ public class Transaction {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    protected Transaction(TransactionCreateCommand cmd) {
+    protected Transaction(TransactionCreateCommand cmd, TransactionStatus status) {
         this.user = cmd.getUser();
         this.wallet = cmd.getWallet();
         this.amount = cmd.getAmount();
         this.transactionType = cmd.getTransactionType();
-        this.status = cmd.getStatus();
+        this.status = status;
         this.idempotencyKey = cmd.getIdempotencyKey();
         this.referenceId = cmd.getReferenceId();
         this.description = cmd.getDescription();
         this.createdAt = LocalDateTime.now();
     }
 
-    public static Transaction create(TransactionCreateCommand cmd) {
-        return new Transaction(cmd);
+    /**
+     * Creates a PENDING transaction.
+     * Used BEFORE wallet mutation.
+     */
+    public static Transaction createPending(TransactionCreateCommand command) {
+        Objects.requireNonNull(command, "TransactionCreateCommand must not be null");
+        return new Transaction(command, TransactionStatus.PENDING);
+    }
+
+    /**
+     * Marks transaction as SUCCESS.
+     * Called ONLY after wallet mutation succeeds.
+     */
+    public void markSuccess() {
+        if (this.status != TransactionStatus.PENDING) {
+            throw new IllegalStateException("Only PENDING transactions can be marked SUCCESS");
+        }
+        this.status = TransactionStatus.SUCCESS;
+    }
+
+    /**
+     * Optional (future-proofing)
+     */
+    public void markFailed() {
+        if (this.status != TransactionStatus.PENDING) {
+            throw new IllegalStateException("Only PENDING transactions can be marked FAILED");
+        }
+        this.status = TransactionStatus.FAILED;
     }
 }

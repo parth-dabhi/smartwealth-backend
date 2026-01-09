@@ -1,31 +1,30 @@
 package com.smartwealth.smartwealth_backend.entity;
 
-import com.smartwealth.smartwealth_backend.entity.enums.TransactionStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Getter
+@Setter
 @Builder
 public class TransactionCreateCommand {
 
-    private final User user;
-    private final Wallet wallet;
-    private final BigDecimal amount;
-    private final TransactionType transactionType;
-    private final TransactionStatus status;
-    private final String idempotencyKey;
-    private final String referenceId;
-    private final String description;
+    private User user;
+    private Wallet wallet;
+    private BigDecimal amount;
+    private TransactionType transactionType;
+    private String idempotencyKey;
+    private String referenceId;
+    private String description;
 
     public TransactionCreateCommand(
             User user,
             Wallet wallet,
             BigDecimal amount,
             TransactionType transactionType,
-            TransactionStatus status,
             String idempotencyKey,
             String referenceId,
             String description
@@ -34,7 +33,6 @@ public class TransactionCreateCommand {
         this.wallet = wallet;
         this.amount = amount;
         this.transactionType = transactionType;
-        this.status = status;
         this.idempotencyKey = idempotencyKey;
         this.referenceId = referenceId;
         this.description = description;
@@ -45,21 +43,18 @@ public class TransactionCreateCommand {
             String idempotencyKey,
             User user,
             Wallet wallet,
-            TransactionType transactionType,
-            TransactionStatus status) {
+            TransactionType transactionType
+    ) {
 
         String operationPrefix = (transactionType == TransactionType.CREDIT) ? "WALLET-CREDIT" : "WALLET-DEBIT";
-        String descriptionText = (transactionType == TransactionType.CREDIT) ? "Wallet credit" : "Wallet debit";
 
         return TransactionCreateCommand.builder()
                 .user(user)
                 .wallet(wallet)
                 .amount(amount)
                 .transactionType(transactionType)
-                .status(status)
                 .idempotencyKey(idempotencyKey)
                 .referenceId(operationPrefix + "-" + System.currentTimeMillis())
-                .description(descriptionText)
                 .build();
     }
 }

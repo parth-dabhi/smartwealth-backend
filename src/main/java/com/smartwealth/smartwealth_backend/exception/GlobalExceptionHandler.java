@@ -1,5 +1,6 @@
 package com.smartwealth.smartwealth_backend.exception;
 
+import com.smartwealth.smartwealth_backend.dto.common.TransactionResponse;
 import com.smartwealth.smartwealth_backend.dto.response.common.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -152,6 +153,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIdempotencyKeyExpiredException(IdempotencyKeyExpiredException ex, HttpServletRequest request) {
         log.warn("Idempotency key expired: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.GONE, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(TransactionFailedException.class)
+    public ResponseEntity<ErrorResponse> handleTransactionFailedException(TransactionFailedException ex, HttpServletRequest request) {
+        log.warn("Transaction failed: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {
