@@ -2,6 +2,8 @@ package com.smartwealth.smartwealth_backend.repository;
 
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.math.BigDecimal;
 import java.util.Optional;
 import com.smartwealth.smartwealth_backend.entity.Transaction;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,16 +20,32 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     boolean existsByIdempotencyKey(String idempotencyKey);
 
-    @Modifying
+    @Modifying(flushAutomatically = true)
     @Query("""
     UPDATE Transaction t
     SET t.status = :status,
-        t.description = :description
+        t.description = :description,
+        t.balanceAfter = :balanceAfter
     WHERE t.id = :id
 """)
-    int updateStatusAndDescription(
+    int updateStatusDescriptionAndBalanceAfter(
             @Param("id") Long id,
             @Param("status") TransactionStatus status,
+            @Param("balanceAfter") BigDecimal balanceAfter,
             @Param("description") String description
     );
+
+    @Query("""
+    SELECT w.balance
+    FROM Wallet w
+    WHERE w.id = :walletId
+""")
+    BigDecimal findWalletBalance(@Param("walletId") Long walletId);
+
+    @Query("""
+    SELECT t.balanceBefore
+    FROM Transaction t
+    WHERE t.id = :txId
+""")
+    BigDecimal findBalanceBefore(@Param("txId") Long txId);
 }

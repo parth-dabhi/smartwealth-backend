@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,8 +26,14 @@ public class TransactionLifecycleService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Transaction createPending(TransactionCreateCommand command) {
 
+        BigDecimal currentBalance =
+                transactionRepository.findWalletBalance(command.getWallet().getId());
+
+        command.setBalanceBefore(currentBalance);
+        command.setBalanceAfter(currentBalance);
+
         Transaction transaction = transactionRepository.save(
-                Transaction.createPending(command)
+                Transaction.createPending(command, currentBalance)
         );
 
         log.info("Transaction created PENDING. txId={}, walletId={}, amount={}",
@@ -43,9 +51,13 @@ public class TransactionLifecycleService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void markFailed(Long transactionId, String reason) {
 
-        int updated = transactionRepository.updateStatusAndDescription(
+        BigDecimal balanceBefore =
+                transactionRepository.findBalanceBefore(transactionId);
+
+        int updated = transactionRepository.updateStatusDescriptionAndBalanceAfter(
                 transactionId,
                 TransactionStatus.FAILED,
+                balanceBefore,
                 reason
         );
 
@@ -65,11 +77,12 @@ public class TransactionLifecycleService {
      * Usually called from the main transaction (NOT REQUIRES_NEW).
      */
     @Transactional
-    public void markSuccess(Long transactionId, String description) {
+    public void markSuccess(Long transactionId, BigDecimal balanceAfter, String description) {
 
-        int updated = transactionRepository.updateStatusAndDescription(
+        int updated = transactionRepository.updateStatusDescriptionAndBalanceAfter(
                 transactionId,
                 TransactionStatus.SUCCESS,
+                balanceAfter,
                 description
         );
 

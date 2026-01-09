@@ -4,6 +4,7 @@ import com.smartwealth.smartwealth_backend.dto.common.TransactionResponse;
 import com.smartwealth.smartwealth_backend.entity.Transaction;
 import com.smartwealth.smartwealth_backend.entity.TransactionCreateCommand;
 import com.smartwealth.smartwealth_backend.entity.Wallet;
+import com.smartwealth.smartwealth_backend.entity.enums.TransactionCategory;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionType;
 import com.smartwealth.smartwealth_backend.exception.*;
@@ -35,8 +36,13 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public TransactionResponse createTransaction(TransactionCreateCommand command) {
-        log.info("Processing transaction. idempotencyKey={}, walletId={}, type={}, amount={}",
-                command.getIdempotencyKey(), command.getWallet().getId(), command.getTransactionType(), command.getAmount());
+        log.info("Processing transaction. idempotencyKey={}, walletId={}, type={}, category={}, amount={}",
+                command.getIdempotencyKey(),
+                command.getWallet().getId(),
+                command.getTransactionType(),
+                command.getTransactionCategory(),
+                command.getAmount()
+        );
 
         String idempotencyKey = command.getIdempotencyKey();
 
@@ -67,16 +73,15 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getId(), command.getWallet().getId(), command.getTransactionType(), command.getAmount(), ex.getMessage());
             throw new TransactionFailedException(ex.getMessage());
         } catch (Exception ex) {
-            transactionLifecycleService.markFailed(transaction.getId(), "System error during wallet update");
+            transactionLifecycleService.markFailed(transaction.getId(), "Unexpected error during wallet update: " + ex.getMessage());
             log.error("Unexpected error during wallet update. txId={}, walletId={}, type={}, amount={}",
                     transaction.getId(), command.getWallet().getId(), command.getTransactionType(), command.getAmount(), ex);
             throw ex;
         }
 
         // 4. mark transaction SUCCESS
-        transactionLifecycleService.markSuccess(transaction.getId(), "Wallet"
-                + (command.getTransactionType() == TransactionType.CREDIT ? " credited " : " debited ")
-                + "successfully");
+        transactionLifecycleService.markSuccess(transaction.getId(), updatedWallet.getBalance(),
+                "Wallet " + (command.getTransactionType() == TransactionType.CREDIT ? "credited" : "debited") + " successfully");
 
         log.info("Transaction SUCCESS. txId={}, walletId={}, type={}, amount={}, newBalance={}", transaction.getId(),
                 transaction.getWallet().getId(), transaction.getTransactionType(), transaction.getAmount(), updatedWallet.getBalance());
@@ -86,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
                 updatedWallet.getBalance(),
                 updatedWallet.getLockedBalance(),
                 "Wallet" + (command.getTransactionType() == TransactionType.CREDIT ? " credited " : " debited ")
-                        + "successfully"
+                        + "successfully, of category " + command.getTransactionCategory()
         );
     }
 

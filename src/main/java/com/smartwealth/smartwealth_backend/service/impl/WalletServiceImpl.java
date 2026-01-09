@@ -6,6 +6,7 @@ import com.smartwealth.smartwealth_backend.entity.TransactionCreateCommand;
 import com.smartwealth.smartwealth_backend.entity.User;
 import com.smartwealth.smartwealth_backend.entity.Wallet;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
+import com.smartwealth.smartwealth_backend.entity.enums.TransactionCategory;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionType;
 import com.smartwealth.smartwealth_backend.exception.InactiveAccountException;
 import com.smartwealth.smartwealth_backend.exception.KycVerificationException;
@@ -116,12 +117,14 @@ public class WalletServiceImpl implements WalletService {
         User user = userService.getUserByCustomerId(customerId);
         validateUserEligibility(user.isActive(), user.getKycStatus());
         Wallet wallet = getWalletByUser(user);
+        TransactionCategory category = (transactionType == TransactionType.CREDIT) ? TransactionCategory.TOP_UP : TransactionCategory.WITHDRAWAL;
         return TransactionCreateCommand.from(
-                amount,
-                idempotencyKey,
                 user,
                 wallet,
-                transactionType
+                amount,
+                idempotencyKey,
+                transactionType,
+                category
         );
     }
 
