@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.exception;
+package com.smartwealth.smartwealth_backend.exception.wallet;
 
 public class WalletLimitExceededException extends RuntimeException {
     public WalletLimitExceededException(String message) {

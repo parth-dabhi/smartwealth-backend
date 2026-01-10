@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.exception;
+package com.smartwealth.smartwealth_backend.exception.auth;
 
 public class AuthenticationException extends RuntimeException {
     public AuthenticationException(String message) {

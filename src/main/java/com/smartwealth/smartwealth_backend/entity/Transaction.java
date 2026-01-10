@@ -42,14 +42,12 @@ public class Transaction {
     private Long id;
 
     // Owner of the transaction
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, updatable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false, updatable = false)
+    private Long userId;
 
     // Wallet involved
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "wallet_id", nullable = false, updatable = false)
-    private Wallet wallet;
+    @Column(name = "wallet_id", nullable = false, updatable = false)
+    private Long walletId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false, length = 10, updatable = false)
@@ -85,8 +83,8 @@ public class Transaction {
     private LocalDateTime createdAt;
 
     protected Transaction(TransactionCreateCommand cmd, TransactionStatus status, BigDecimal currentBalance) {
-        this.user = cmd.getUser();
-        this.wallet = cmd.getWallet();
+        this.userId = cmd.getUserId();
+        this.walletId = cmd.getWalletId();
         this.amount = cmd.getAmount();
         this.balanceBefore = currentBalance;
         this.balanceAfter = currentBalance;

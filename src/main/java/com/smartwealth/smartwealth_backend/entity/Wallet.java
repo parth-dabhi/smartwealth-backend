@@ -29,12 +29,11 @@ public class Wallet {
 
     // Ownership
     // One wallet belongs to exactly one user
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false, updatable = false)
+    private Long userId;
 
     // Available balance (can be spent)
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(name = "balance", nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
 
     // Reserved / locked funds (cannot be spent) Simple Balance ≥ Locked Balance
@@ -42,21 +41,21 @@ public class Wallet {
     private BigDecimal lockedBalance;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "status", nullable = false, length = 20)
     private WalletStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    protected Wallet(User user) {
-        this.user = user;
+    protected Wallet(Long userId) {
+        this.userId = userId;
         this.balance = BigDecimal.ZERO;
         this.lockedBalance = BigDecimal.ZERO;
         this.status = WalletStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
     }
 
-    public static Wallet createFor(User user) {
-        return new Wallet(user);
+    public static Wallet createFor(Long userId) {
+        return new Wallet(userId);
     }
 }

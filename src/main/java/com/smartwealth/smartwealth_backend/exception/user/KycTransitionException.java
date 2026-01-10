@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.exception;
+package com.smartwealth.smartwealth_backend.exception.user;
 
 public class KycTransitionException extends RuntimeException {
     public KycTransitionException(String message) {

@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 @Builder
 public class TransactionCreateCommand {
 
-    private User user;
-    private Wallet wallet;
+    private Long userId;
+    private Long walletId;
     private BigDecimal amount;
     private BigDecimal balanceBefore;
     private BigDecimal balanceAfter;
@@ -25,8 +25,8 @@ public class TransactionCreateCommand {
     private String description;
 
     public static TransactionCreateCommand from(
-            User user,
-            Wallet wallet,
+            Long userId,
+            Long walletId,
             BigDecimal amount,
             String idempotencyKey,
             TransactionType transactionType,
@@ -37,8 +37,8 @@ public class TransactionCreateCommand {
                 (transactionType == TransactionType.CREDIT) ? "WALLET-CREDIT" : "WALLET-DEBIT";
 
         return TransactionCreateCommand.builder()
-                .user(user)
-                .wallet(wallet)
+                .userId(userId)
+                .walletId(walletId)
                 .amount(amount)
                 .transactionType(transactionType)
                 .transactionCategory(transactionCategory)

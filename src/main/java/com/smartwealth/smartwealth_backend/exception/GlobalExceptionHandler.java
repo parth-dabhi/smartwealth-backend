@@ -1,7 +1,18 @@
 package com.smartwealth.smartwealth_backend.exception;
 
-import com.smartwealth.smartwealth_backend.dto.common.TransactionResponse;
 import com.smartwealth.smartwealth_backend.dto.response.common.ErrorResponse;
+import com.smartwealth.smartwealth_backend.exception.auth.AuthenticationException;
+import com.smartwealth.smartwealth_backend.exception.resource.ResourceAlreadyExistsException;
+import com.smartwealth.smartwealth_backend.exception.resource.ResourceNotFoundException;
+import com.smartwealth.smartwealth_backend.exception.transaction.IdempotencyKeyExpiredException;
+import com.smartwealth.smartwealth_backend.exception.transaction.TransactionFailedException;
+import com.smartwealth.smartwealth_backend.exception.user.InactiveAccountException;
+import com.smartwealth.smartwealth_backend.exception.user.KycTransitionException;
+import com.smartwealth.smartwealth_backend.exception.user.KycVerificationException;
+import com.smartwealth.smartwealth_backend.exception.wallet.InsufficientBalanceException;
+import com.smartwealth.smartwealth_backend.exception.wallet.WalletLimitExceededException;
+import com.smartwealth.smartwealth_backend.exception.wallet.WalletNotFoundException;
+import com.smartwealth.smartwealth_backend.exception.wallet.WalletSuspendedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -159,6 +170,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleTransactionFailedException(TransactionFailedException ex, HttpServletRequest request) {
         log.warn("Transaction failed: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(WalletSuspendedException.class)
+    public ResponseEntity<ErrorResponse> handleWalletSuspendedException(WalletSuspendedException ex, HttpServletRequest request) {
+        log.warn("Wallet is suspended: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {

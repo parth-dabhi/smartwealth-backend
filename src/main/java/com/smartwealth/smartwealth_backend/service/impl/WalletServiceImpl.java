@@ -3,16 +3,17 @@ package com.smartwealth.smartwealth_backend.service.impl;
 import com.smartwealth.smartwealth_backend.dto.common.TransactionResponse;
 import com.smartwealth.smartwealth_backend.dto.response.wallet.WalletBalanceResponse;
 import com.smartwealth.smartwealth_backend.entity.TransactionCreateCommand;
-import com.smartwealth.smartwealth_backend.entity.User;
-import com.smartwealth.smartwealth_backend.entity.Wallet;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionCategory;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionType;
-import com.smartwealth.smartwealth_backend.exception.InactiveAccountException;
-import com.smartwealth.smartwealth_backend.exception.KycVerificationException;
-import com.smartwealth.smartwealth_backend.exception.WalletNotFoundException;
+import com.smartwealth.smartwealth_backend.entity.enums.WalletStatus;
+import com.smartwealth.smartwealth_backend.exception.user.InactiveAccountException;
+import com.smartwealth.smartwealth_backend.exception.user.KycVerificationException;
+import com.smartwealth.smartwealth_backend.exception.wallet.WalletNotFoundException;
+import com.smartwealth.smartwealth_backend.exception.wallet.WalletSuspendedException;
 import com.smartwealth.smartwealth_backend.repository.WalletRepository;
-import com.smartwealth.smartwealth_backend.repository.projection.WalletBalanceProjection;
+import com.smartwealth.smartwealth_backend.repository.projection.UserEligibilityProjection;
+import com.smartwealth.smartwealth_backend.repository.projection.WalletProjection;
 import com.smartwealth.smartwealth_backend.service.UserService;
 import com.smartwealth.smartwealth_backend.service.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +40,11 @@ public class WalletServiceImpl implements WalletService {
     @Override
     @Transactional(readOnly = true, label = "WALLET_BALANCE_RETRIEVAL_OPERATION")
     public WalletBalanceResponse getWalletBalance(String customerId) {
-        User user = userService.getUserByCustomerId(customerId);
-        WalletBalanceProjection projection = walletRepository
-                .findBalanceByUser(user)
-                .orElseThrow(() -> new WalletNotFoundException("Wallet not found for userId=" + user.getId()));
+        Long userId = userService.getUserIdByCustomerId(customerId);
+        WalletProjection projection = getWalletProjectionByUserId(userId);
+        if (projection.getStatus() != WalletStatus.ACTIVE) {
+            throw new WalletSuspendedException("Wallet is not active for customerId=" + customerId);
+        }
         return WalletBalanceResponse.from(
                 projection.getBalance(),
                 projection.getLockedBalance(),
@@ -114,13 +116,22 @@ public class WalletServiceImpl implements WalletService {
 
     private TransactionCreateCommand getTransactionCreateCommand(String customerId, BigDecimal amount, String idempotencyKey, TransactionType transactionType) {
         validatePositiveAmount(amount);
-        User user = userService.getUserByCustomerId(customerId);
-        validateUserEligibility(user.isActive(), user.getKycStatus());
-        Wallet wallet = getWalletByUser(user);
+        UserEligibilityProjection userEligibility = userService.getUserEligibilityByCustomerId(customerId);
+        Long userId = userEligibility.getId();
+        validateUserEligibility(userEligibility.getIsActive(), userEligibility.getKycStatus());
+
+        WalletProjection walletProjection = getWalletProjectionByUserId(userId);
+        Long walletId = walletProjection.getId();
+        WalletStatus walletStatus = walletProjection.getStatus();
+        if (walletStatus != WalletStatus.ACTIVE) {
+            throw new WalletSuspendedException("Wallet is not active for customerId=" + customerId + "Can't perform " + transactionType.name() + " transaction.");
+        }
+
         TransactionCategory category = (transactionType == TransactionType.CREDIT) ? TransactionCategory.TOP_UP : TransactionCategory.WITHDRAWAL;
+
         return TransactionCreateCommand.from(
-                user,
-                wallet,
+                userId,
+                walletId,
                 amount,
                 idempotencyKey,
                 transactionType,
@@ -143,9 +154,9 @@ public class WalletServiceImpl implements WalletService {
         }
     }
 
-    private Wallet getWalletByUser(User user) {
-        log.info("Fetching wallet for user id: {}", user.getId());
-        return walletRepository.findByUser(user)
-                .orElseThrow(() -> new WalletNotFoundException("Wallet not found for userId=" + user.getId()));
+    private WalletProjection getWalletProjectionByUserId(Long userId) {
+        log.info("Fetching wallet projection for user id: {}", userId);
+        return walletRepository.findWalletProjectionByUserId(userId)
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found for userId=" + userId));
     }
 }

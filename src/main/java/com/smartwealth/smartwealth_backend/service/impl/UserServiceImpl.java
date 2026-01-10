@@ -7,10 +7,11 @@ import com.smartwealth.smartwealth_backend.entity.Wallet;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
-import com.smartwealth.smartwealth_backend.exception.ResourceAlreadyExistsException;
-import com.smartwealth.smartwealth_backend.exception.ResourceNotFoundException;
+import com.smartwealth.smartwealth_backend.exception.resource.ResourceAlreadyExistsException;
+import com.smartwealth.smartwealth_backend.exception.resource.ResourceNotFoundException;
 import com.smartwealth.smartwealth_backend.repository.UserRepository;
 import com.smartwealth.smartwealth_backend.repository.WalletRepository;
+import com.smartwealth.smartwealth_backend.repository.projection.UserEligibilityProjection;
 import com.smartwealth.smartwealth_backend.service.CustomerIdGeneratorService;
 import com.smartwealth.smartwealth_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
         // Create Wallet for New User
         log.info("Creating wallet for user customerId={}", savedUser.getCustomerId());
-        Wallet wallet = Wallet.createFor(savedUser);
+        Wallet wallet = Wallet.createFor(savedUser.getId());
         walletRepository.save(wallet);
         log.info("Wallet created for userId={} walletId={}", savedUser.getId(), wallet.getId());
 
@@ -75,7 +76,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true, label = "FETCH_USER_BY_ID")
     public User getUserByCustomerId(String customerId) {
         log.info("Fetching user by customerId={}", customerId);
         return userRepository.findByCustomerId(customerId)
@@ -83,7 +83,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true, label = "FETCH_USER_BY_EMAIL")
     public User getUserByEmail(String email) {
         log.info("Fetching user by email={}", email);
         return userRepository.findByEmail(email)
@@ -109,5 +108,21 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         log.info("Risk profile updated successfully for customerId={}", customerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long getUserIdByCustomerId(String customerId) {
+        log.info("Fetching user ID by customerId={}", customerId);
+        return userRepository.findUserIdByCustomerId(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserEligibilityProjection getUserEligibilityByCustomerId(String customerId) {
+        log.info("Fetching user eligibility by customerId={}", customerId);
+        return userRepository.findEligibilityByCustomerId(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }

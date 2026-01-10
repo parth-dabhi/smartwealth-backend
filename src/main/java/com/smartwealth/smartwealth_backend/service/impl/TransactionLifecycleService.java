@@ -27,7 +27,7 @@ public class TransactionLifecycleService {
     public Transaction createPending(TransactionCreateCommand command) {
 
         BigDecimal currentBalance =
-                transactionRepository.findWalletBalance(command.getWallet().getId());
+                transactionRepository.findWalletBalance(command.getWalletId());
 
         command.setBalanceBefore(currentBalance);
         command.setBalanceAfter(currentBalance);
@@ -38,7 +38,7 @@ public class TransactionLifecycleService {
 
         log.info("Transaction created PENDING. txId={}, walletId={}, amount={}",
                 transaction.getId(),
-                transaction.getWallet().getId(),
+                transaction.getWalletId(),
                 transaction.getAmount());
 
         return transaction;
