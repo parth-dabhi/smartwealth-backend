@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
         // Generate Customer ID
         user.setCustomerId(customerIdGenerator.generateCustomerId());
         // Save entity
-        User savedUser  = userRepository.save(user);
+        User savedUser  = userRepository.saveAndFlush(user);
         log.info("User created successfully. customerId={}", savedUser .getCustomerId());
 
         // Create Wallet for New User

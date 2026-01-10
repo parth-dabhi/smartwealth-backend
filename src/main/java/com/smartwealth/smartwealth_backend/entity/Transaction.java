@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Objects;
 
 @Entity
@@ -20,16 +21,6 @@ import java.util.Objects;
                 @Index(name = "idx_tx_user_id", columnList = "user_id"),
                 @Index(name = "idx_tx_wallet_id", columnList = "wallet_id"),
                 @Index(name = "idx_tx_category", columnList = "transaction_category")
-        },
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uk_tx_idempotency_key",
-                        columnNames = "idempotency_key"
-                ),
-                @UniqueConstraint(
-                        name = "uk_tx_reference_id",
-                        columnNames = "reference_id"
-                )
         }
 )
 @Getter
@@ -70,17 +61,17 @@ public class Transaction {
     @Column(name = "balance_after", nullable = false, precision = 19, scale = 2)
     private BigDecimal balanceAfter;
 
-    @Column(name = "idempotency_key", nullable = false, length = 100, updatable = false)
+    @Column(name = "idempotency_key", nullable = false, length = 100, updatable = false, unique = true)
     private String idempotencyKey;
 
-    @Column(name = "reference_id", nullable = false, length = 100, updatable = false)
+    @Column(name = "reference_id", nullable = false, length = 100, updatable = false, unique = true)
     private String referenceId;
 
-    @Column(name = "description", length = 255, updatable = false)
+    @Column(name = "description", updatable = false)
     private String description;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     protected Transaction(TransactionCreateCommand cmd, TransactionStatus status, BigDecimal currentBalance) {
         this.userId = cmd.getUserId();
@@ -94,7 +85,7 @@ public class Transaction {
         this.idempotencyKey = cmd.getIdempotencyKey();
         this.referenceId = cmd.getReferenceId();
         this.description = cmd.getDescription();
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
     /**

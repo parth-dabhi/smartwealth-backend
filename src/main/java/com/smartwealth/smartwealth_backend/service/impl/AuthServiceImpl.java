@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 
 @Service
 @Slf4j
@@ -59,9 +60,9 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Login successful for customerId={}", user.getCustomerId());
 
-        Instant previousLoginAt = user.getLastLoginAt();
+        OffsetDateTime previousLoginAt = user.getLastLoginAt();
 
-        user.setLastLoginAt(Instant.now());
+        user.setLastLoginAt(OffsetDateTime.now());
         userRepository.save(user); // Update last login time to DB
 
         log.info("Updated lastLoginAt for customerId={}", user.getCustomerId());

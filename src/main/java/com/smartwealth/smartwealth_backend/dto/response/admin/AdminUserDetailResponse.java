@@ -12,6 +12,7 @@ import lombok.Getter;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 @Getter
@@ -32,8 +33,8 @@ public class AdminUserDetailResponse {
     private RiskProfile riskProfile;
 
     private boolean isActive;
-    private Instant createdAt;
-    private Instant lastLoginAt;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime lastLoginAt;
 
     /**
      * Hypermedia links for admin navigation

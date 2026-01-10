@@ -4,12 +4,11 @@ import com.smartwealth.smartwealth_backend.dto.response.admin.AdminUserDetailRes
 import com.smartwealth.smartwealth_backend.dto.response.admin.AdminUserListItemResponse;
 import com.smartwealth.smartwealth_backend.dto.response.admin.AdminUserListResponse;
 import com.smartwealth.smartwealth_backend.dto.response.common.PageMetaResponse;
-import com.smartwealth.smartwealth_backend.dto.response.user.AddressResponse;
 import com.smartwealth.smartwealth_backend.entity.User;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
-import com.smartwealth.smartwealth_backend.exception.KycTransitionException;
-import com.smartwealth.smartwealth_backend.exception.ResourceNotFoundException;
+import com.smartwealth.smartwealth_backend.exception.user.KycTransitionException;
+import com.smartwealth.smartwealth_backend.exception.resource.ResourceNotFoundException;
 import com.smartwealth.smartwealth_backend.repository.UserRepository;
 import com.smartwealth.smartwealth_backend.repository.projection.AdminUserListProjection;
 import com.smartwealth.smartwealth_backend.repository.specification.AdminUserSpecification;

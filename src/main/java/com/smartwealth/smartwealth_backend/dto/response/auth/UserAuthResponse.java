@@ -8,8 +8,11 @@ import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import lombok.*;
 
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -17,6 +20,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class UserAuthResponse {
+
     private String customerId;
     private String email;
     private String mobileNumber;
@@ -28,9 +32,20 @@ public class UserAuthResponse {
     private KycStatus kycStatus;
     private RiskProfile riskProfile;
     private boolean isActive;
-    private Instant lastLoginAt;
+    private String lastLoginAt;
 
-    public static UserAuthResponse toResponse(User user, Instant lastLoginAt) {
+    private static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
+    private static final DateTimeFormatter IST_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+
+    public static UserAuthResponse toResponse(User user, OffsetDateTime lastLoginAt) {
+
+        String formattedLastLogin = null;
+
+        if (lastLoginAt != null) {
+            ZonedDateTime istTime = lastLoginAt.atZoneSameInstant(IST_ZONE);
+            formattedLastLogin = istTime.format(IST_FORMATTER);
+        }
+
         return UserAuthResponse.builder()
                 .customerId(user.getCustomerId())
                 .email(user.getEmail())
@@ -43,7 +58,7 @@ public class UserAuthResponse {
                 .kycStatus(user.getKycStatus())
                 .riskProfile(user.getRiskProfile())
                 .isActive(user.isActive())
-                .lastLoginAt(lastLoginAt)
+                .lastLoginAt(formattedLastLogin)
                 .build();
     }
 }

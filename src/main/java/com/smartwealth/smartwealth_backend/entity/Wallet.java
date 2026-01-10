@@ -7,18 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Entity
-@Table(
-        name = "wallets",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uk_wallet_user",
-                        columnNames = "user_id"
-                )
-        }
-)
+@Table(name = "wallets")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Wallet {
@@ -29,7 +22,7 @@ public class Wallet {
 
     // Ownership
     // One wallet belongs to exactly one user
-    @Column(name = "user_id", nullable = false, updatable = false)
+    @Column(name = "user_id", nullable = false, updatable = false, unique = true)
     private Long userId;
 
     // Available balance (can be spent)
@@ -45,14 +38,14 @@ public class Wallet {
     private WalletStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     protected Wallet(Long userId) {
         this.userId = userId;
         this.balance = BigDecimal.ZERO;
         this.lockedBalance = BigDecimal.ZERO;
         this.status = WalletStatus.ACTIVE;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
     public static Wallet createFor(Long userId) {

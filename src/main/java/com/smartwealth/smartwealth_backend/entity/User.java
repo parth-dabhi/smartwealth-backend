@@ -6,9 +6,11 @@ import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenerationTime;
 
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Getter
 @Setter
@@ -17,9 +19,7 @@ import java.time.LocalDate;
 @Builder
 @Entity
 @Table(name = "users", indexes = {
-        @Index(name = "idx_user_customer_id", columnList = "customer_id"),
-        @Index(name = "idx_user_email", columnList = "email"),
-        @Index(name = "idx_user_mobile_number", columnList = "mobile_number")
+        @Index(name = "idx_user_kyc_active", columnList = "kyc_status, is_active")
 })
 public class User {
 
@@ -29,12 +29,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "customer_id", unique = true, length = 8, updatable = false)
+    @Column(name = "customer_id", nullable = false, unique = true, length = 8, updatable = false)
     private String customerId; // 8-digit Customer ID - to be filled by service before insert.
 
     // Authentication & Identity
 
-    @Column(nullable = false, length = 100, unique = true)
+    @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
     @Column(name="mobile_number", nullable=false, length=10, unique=true)
@@ -62,7 +62,7 @@ public class User {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private UserRole role = UserRole.USER;
 
     @Builder.Default
@@ -82,25 +82,25 @@ public class User {
     private boolean isActive = true;
 
     @Column(name="created_at", nullable=false, updatable=false)
-    private Instant createdAt;
+    private OffsetDateTime createdAt;
 
     @Column(name="updated_at", nullable=false)
-    private Instant updatedAt;
+    private OffsetDateTime updatedAt;
 
     @Column(name="last_login_at")
-    private Instant lastLoginAt;
+    private OffsetDateTime lastLoginAt;
 
     // Lifecycle Hooks
 
     @PrePersist
     public void prePersist() {
-        Instant now = Instant.now();
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         this.createdAt = now;
         this.updatedAt = now;
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = Instant.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 }
