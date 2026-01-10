@@ -16,6 +16,7 @@ import com.smartwealth.smartwealth_backend.service.CustomerIdGeneratorService;
 import com.smartwealth.smartwealth_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -49,21 +50,23 @@ public class UserServiceImpl implements UserService {
         user.setRole(UserRole.USER);
         user.setKycStatus(KycStatus.PENDING);
         user.setRiskProfile(RiskProfile.MODERATE);
-        // Hash password
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        // Generate Customer ID
-        user.setCustomerId(customerIdGenerator.generateCustomerId());
-        // Save entity
-        User savedUser  = userRepository.saveAndFlush(user);
-        log.info("User created successfully. customerId={}", savedUser .getCustomerId());
+        user.setCustomerId(customerIdGenerator.generateCustomerId()); // Generate Customer ID - db call
 
-        // Create Wallet for New User
-        log.info("Creating wallet for user customerId={}", savedUser.getCustomerId());
-        Wallet wallet = Wallet.createFor(savedUser.getId());
-        walletRepository.save(wallet);
-        log.info("Wallet created for userId={} walletId={}", savedUser.getId(), wallet.getId());
+        try {
+            User savedUser  = userRepository.save(user);
+            log.info("User created successfully. customerId={}", savedUser .getCustomerId());
 
-        return Optional.of(UserAuthResponse.toResponse(savedUser, null));
+            // Create Wallet for New User
+            log.info("Creating wallet for user customerId={}", savedUser.getCustomerId());
+            Wallet wallet = Wallet.createFor(savedUser.getId());
+            walletRepository.save(wallet);
+            log.info("Wallet created for userId={} walletId={}", savedUser.getId(), wallet.getId());
+
+            return Optional.of(UserAuthResponse.toResponse(savedUser, null));
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResourceAlreadyExistsException("User with provided details already exists.");
+        }
     }
 
     private void validateDuplicateUser(UserCreateRequest request) {
