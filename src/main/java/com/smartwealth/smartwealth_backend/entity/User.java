@@ -6,8 +6,6 @@ import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenerationTime;
-
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

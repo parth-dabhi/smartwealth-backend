@@ -45,7 +45,8 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers(ApiPaths.API_AUTH + ApiPaths.AUTH_LOGIN, ApiPaths.API_AUTH + ApiPaths.AUTH_REFRESH).permitAll()
                         .requestMatchers(HttpMethod.POST, ApiPaths.API_USERS).permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
+                        .requestMatchers("/internal/nav/**").permitAll() // nav import endpoints
                         .requestMatchers("/actuator/**").permitAll()
 
                         // Preflight (CORS)

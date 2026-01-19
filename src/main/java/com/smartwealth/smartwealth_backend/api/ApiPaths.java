@@ -6,6 +6,7 @@ public final class ApiPaths {
 
     // Base API Path
     public static final String API = "/api";
+    public static final String PUBLIC_API = API + "/public";
 
     // User
     public static final String USERS = "/users";
@@ -33,4 +34,22 @@ public final class ApiPaths {
     public static final String WALLET_BALANCE = "/balance";
     public static final String WALLET_CREDIT = "/credit";
     public static final String WALLET_DEBIT = "/debit";
+
+    // schemes
+    public static final String SCHEMES = "/schemes";
+    public static final String API_SCHEMES = PUBLIC_API + SCHEMES;
+
+
+    // plans
+    public static final String PLANS = "/plans";
+    public static final String API_PLANS = PUBLIC_API + PLANS;
+    public static final String PLAN_ID = "/{planId}";
+
+    // nav
+    public static final String NAV_HISTORY = "/nav-history";
+    public static final String API_NAV_HISTORY = PUBLIC_API + NAV_HISTORY;
+
+    // filters
+    public static final String FILTERS = "/filters";
+    public static final String API_FILTERS = PUBLIC_API + FILTERS;
 }

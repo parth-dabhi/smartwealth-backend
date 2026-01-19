@@ -1,6 +1,6 @@
 package com.smartwealth.smartwealth_backend.service.impl;
 
-import com.smartwealth.smartwealth_backend.dto.common.TransactionResponse;
+import com.smartwealth.smartwealth_backend.dto.response.transaction.TransactionResponse;
 import com.smartwealth.smartwealth_backend.entity.Transaction;
 import com.smartwealth.smartwealth_backend.entity.TransactionCreateCommand;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionType;

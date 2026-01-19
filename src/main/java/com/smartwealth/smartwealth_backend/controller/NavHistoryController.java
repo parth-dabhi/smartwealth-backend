@@ -1,0 +1,28 @@
+package com.smartwealth.smartwealth_backend.controller;
+
+import com.smartwealth.smartwealth_backend.api.ApiPaths;
+import com.smartwealth.smartwealth_backend.dto.response.nav.NavHistoryResponse;
+import com.smartwealth.smartwealth_backend.service.NavHistoryService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping(ApiPaths.API_NAV_HISTORY)
+@RequiredArgsConstructor
+@Slf4j
+public class NavHistoryController {
+
+    private final NavHistoryService navHistoryService;
+
+    @GetMapping
+    public ResponseEntity<NavHistoryResponse> getNavHistory(@RequestParam Integer planId) {
+        log.debug("Fetching NAV history for planId={}", planId);
+        NavHistoryResponse response = navHistoryService.getNavHistory(planId);
+        return ResponseEntity.ok(response);
+    }
+}

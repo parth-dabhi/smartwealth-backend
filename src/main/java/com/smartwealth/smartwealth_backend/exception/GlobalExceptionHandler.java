@@ -2,6 +2,8 @@ package com.smartwealth.smartwealth_backend.exception;
 
 import com.smartwealth.smartwealth_backend.dto.response.common.ErrorResponse;
 import com.smartwealth.smartwealth_backend.exception.auth.AuthenticationException;
+import com.smartwealth.smartwealth_backend.exception.nav.NavHistoryNotFoundException;
+import com.smartwealth.smartwealth_backend.exception.plan.PlanNotFoundException;
 import com.smartwealth.smartwealth_backend.exception.resource.ResourceAlreadyExistsException;
 import com.smartwealth.smartwealth_backend.exception.resource.ResourceNotFoundException;
 import com.smartwealth.smartwealth_backend.exception.transaction.IdempotencyKeyExpiredException;
@@ -176,6 +178,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleWalletSuspendedException(WalletSuspendedException ex, HttpServletRequest request) {
         log.warn("Wallet is suspended: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(PlanNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePlanNotFoundException(PlanNotFoundException ex, HttpServletRequest request) {
+        log.warn("Plan not found: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(NavHistoryNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNavDataNotFoundException(NavHistoryNotFoundException ex, HttpServletRequest request) {
+        log.warn("NAV data not found: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {

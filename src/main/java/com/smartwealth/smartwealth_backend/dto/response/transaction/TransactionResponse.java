@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.dto.common;
+package com.smartwealth.smartwealth_backend.dto.response.transaction;
 
 import com.smartwealth.smartwealth_backend.entity.Transaction;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionCategory;
