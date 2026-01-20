@@ -2,11 +2,15 @@ package com.smartwealth.smartwealth_backend.dto.response.plan;
 
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
 import com.smartwealth.smartwealth_backend.repository.projection.PlanProjection;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PlanSummaryResponse {
     private Integer planId;
     private String planType;

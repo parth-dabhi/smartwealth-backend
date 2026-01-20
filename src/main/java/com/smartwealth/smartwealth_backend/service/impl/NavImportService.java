@@ -5,6 +5,7 @@ import com.smartwealth.smartwealth_backend.repository.SchemePlanRepository;
 import com.smartwealth.smartwealth_backend.repository.projection.IsinAndPlanIdProjection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
@@ -31,12 +32,14 @@ public class NavImportService {
 
     // PUBLIC API
     @Transactional
+    @CacheEvict(value = {"latestNav", "navHistory", "planDetail"}, allEntries = true)
     public String importTodayNav() {
         log.info("Starting TODAY NAV import");
         return importNavFromUrl(TODAY_NAV_URL, NavFileType.TODAY);
     }
 
     @Transactional
+    @CacheEvict(value = {"latestNav", "navHistory", "planDetail"}, allEntries = true)
     public String importHistoricalNav(String fromDate) {
         log.info("Starting HISTORICAL NAV import for date: {}", fromDate);
         String url = String.format(HISTORICAL_NAV_URL, fromDate);

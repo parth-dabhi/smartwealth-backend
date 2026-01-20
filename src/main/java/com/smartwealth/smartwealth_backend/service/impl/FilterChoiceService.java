@@ -6,8 +6,8 @@ import com.smartwealth.smartwealth_backend.dto.response.filter.FilterChoicesResp
 import com.smartwealth.smartwealth_backend.repository.FilterLookupDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,7 @@ public class FilterChoiceService {
 
     private final FilterLookupDao filterLookupDao;
 
+    @Cacheable(value = "filters")
     public FilterChoicesResponse getFilterChoices() {
 
         return FilterChoicesResponse.builder()

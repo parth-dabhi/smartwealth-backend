@@ -16,6 +16,9 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+  cache:
+    type: redis
+
 jwt:
   secret:
     access: ${JWT_ACCESS_SECRET}

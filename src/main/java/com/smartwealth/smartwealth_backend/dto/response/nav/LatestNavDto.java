@@ -1,4 +1,4 @@
-package com.smartwealth.smartwealth_backend.dto.common;
+package com.smartwealth.smartwealth_backend.dto.response.nav;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,9 +12,9 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NavSummary {
+public class LatestNavDto {
 
-    private LocalDate latestDate;
-    private BigDecimal latestValue;
-    private String historyLink;
+    private LocalDate navDate;
+    private BigDecimal navValue;
 }
+

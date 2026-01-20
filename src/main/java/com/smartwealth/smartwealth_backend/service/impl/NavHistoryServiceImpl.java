@@ -1,15 +1,18 @@
 package com.smartwealth.smartwealth_backend.service.impl;
 
 import com.smartwealth.smartwealth_backend.dto.common.NavHistoryPoint;
+import com.smartwealth.smartwealth_backend.dto.response.nav.LatestNavDto;
 import com.smartwealth.smartwealth_backend.dto.response.nav.NavHistoryResponse;
 import com.smartwealth.smartwealth_backend.exception.nav.NavHistoryNotFoundException;
 import com.smartwealth.smartwealth_backend.exception.plan.PlanNotFoundException;
 import com.smartwealth.smartwealth_backend.repository.NavHistoryRepository;
 import com.smartwealth.smartwealth_backend.repository.SchemePlanRepository;
 import com.smartwealth.smartwealth_backend.repository.projection.NavHistoryProjection;
+import com.smartwealth.smartwealth_backend.repository.projection.NavLatestProjection;
 import com.smartwealth.smartwealth_backend.service.NavHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +26,11 @@ public class NavHistoryServiceImpl implements NavHistoryService {
     private final SchemePlanRepository schemePlanRepository;
 
     @Override
+    @Cacheable(
+            value = "navHistory",
+            key = "#planId",
+            unless = "#result == null"
+    )
     public NavHistoryResponse getNavHistory(Integer planId) {
 
         if (!schemePlanRepository.existsByPlanId(planId)) {
@@ -46,5 +54,22 @@ public class NavHistoryServiceImpl implements NavHistoryService {
                 .planId(planId)
                 .navs(points)
                 .build();
+    }
+
+    @Override
+    @Cacheable(
+            value = "latestNav",
+            key = "#planId",
+            unless = "#result == null"
+    )
+    public LatestNavDto getLatestNav(Integer planId) {
+        log.debug("Latest NAV cache MISS for planId={}", planId);
+        return navHistoryRepository.findLatestNavByPlanId(planId)
+                .map(p -> LatestNavDto.builder()
+                        .navDate(p.getNavDate())
+                        .navValue(p.getNavValue())
+                        .build()
+                )
+                .orElse(null);
     }
 }

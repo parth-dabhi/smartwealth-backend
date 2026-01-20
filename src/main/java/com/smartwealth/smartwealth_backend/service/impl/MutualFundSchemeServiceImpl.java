@@ -10,6 +10,7 @@ import com.smartwealth.smartwealth_backend.repository.projection.SchemeProjectio
 import com.smartwealth.smartwealth_backend.service.MutualFundSchemeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,11 @@ public class MutualFundSchemeServiceImpl implements MutualFundSchemeService {
     private final SchemePlanRepository planRepository;
 
     @Override
+    @Cacheable(
+            value = "schemeDiscovery",
+            key = "'{amcId:' + #amcId + ',assetId:' + #assetId + ',categoryId:' + #categoryId + ',optionTypeId:' + #optionTypeId + ',search:' + #search + ',page:' + #page + ',size:' + #size + '}'",
+            unless = "#result == null || #result.data.isEmpty()"
+    )
     public PaginationResponse<SchemeWithPlansResponse> getSchemes(
             Integer amcId,
             Integer assetId,

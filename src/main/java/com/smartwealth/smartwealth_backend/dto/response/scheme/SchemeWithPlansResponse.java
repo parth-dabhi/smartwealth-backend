@@ -3,13 +3,17 @@ package com.smartwealth.smartwealth_backend.dto.response.scheme;
 import com.smartwealth.smartwealth_backend.dto.response.plan.PlanSummaryResponse;
 import com.smartwealth.smartwealth_backend.repository.projection.PlanProjection;
 import com.smartwealth.smartwealth_backend.repository.projection.SchemeProjection;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SchemeWithPlansResponse {
 
     // scheme level details

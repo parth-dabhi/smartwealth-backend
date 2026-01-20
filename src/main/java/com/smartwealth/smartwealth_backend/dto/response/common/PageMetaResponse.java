@@ -1,11 +1,15 @@
 package com.smartwealth.smartwealth_backend.dto.response.common;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PageMetaResponse {
 
     private int page;

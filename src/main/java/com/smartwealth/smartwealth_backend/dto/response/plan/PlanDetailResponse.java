@@ -2,16 +2,20 @@ package com.smartwealth.smartwealth_backend.dto.response.plan;
 
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
 import com.smartwealth.smartwealth_backend.dto.common.*;
-import com.smartwealth.smartwealth_backend.repository.projection.NavLatestProjection;
+import com.smartwealth.smartwealth_backend.dto.response.nav.LatestNavDto;
 import com.smartwealth.smartwealth_backend.repository.projection.PlanDetailProjection;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PlanDetailResponse {
 
     private Integer planId;
@@ -31,7 +35,7 @@ public class PlanDetailResponse {
 
     public static PlanDetailResponse from(
             PlanDetailProjection p,
-            NavLatestProjection nav
+            LatestNavDto latestNavDto
     ) {
 
         return PlanDetailResponse.builder()
@@ -71,11 +75,13 @@ public class PlanDetailResponse {
                                 .build()
                 )
                 .nav(
-                        NavSummary.builder()
-                                .latestDate(nav.getNavDate())
-                                .latestValue(nav.getNavValue())
-                                .historyLink(ApiPaths.API_NAV_HISTORY + "?planId=" + p.getPlanId())
-                                .build()
+                        latestNavDto == null
+                                ? null
+                                : NavSummary.builder()
+                                    .latestDate(latestNavDto.getNavDate())
+                                    .latestValue(latestNavDto.getNavValue())
+                                    .historyLink(ApiPaths.API_NAV_HISTORY + "?planId=" + p.getPlanId())
+                                    .build()
                 )
                 .build();
     }
