@@ -37,8 +37,8 @@ public class SchemePlan {
     @Column(name = "plan_type", nullable = false, length = 50)
     private String planType;
 
-    @Column(name = "option_type", nullable = false, length = 50)
-    private String optionType;
+    @Column(name = "option_type_id", nullable = false)
+    private Integer optionTypeId;
 
     @Column(name = "expense_ratio", precision = 5, scale = 2)
     private BigDecimal expenseRatio;
