@@ -6,7 +6,6 @@ import com.smartwealth.smartwealth_backend.entity.enums.TransactionType;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter

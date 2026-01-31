@@ -280,7 +280,7 @@ public class InvestmentServiceImpl implements InvestmentService {
         }
 
         // Fetch minimum configurable lumpsum amount for the plan
-        BigDecimal minAmount = null;
+        BigDecimal minAmount;
         try {
             minAmount = schemePlanRepository.findMinLumpsumAmountByPlanId(r.getPlanId())
                     .orElseThrow(() -> new PlanNotFoundException("Invalid planId: " + r.getPlanId()));

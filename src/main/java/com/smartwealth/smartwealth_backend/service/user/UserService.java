@@ -6,8 +6,6 @@ import com.smartwealth.smartwealth_backend.entity.user.User;
 import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.repository.user.projection.UserEligibilityProjection;
 
-import java.util.Optional;
-
 public interface UserService {
 
     UserAuthResponse createUser(UserCreateRequest request);

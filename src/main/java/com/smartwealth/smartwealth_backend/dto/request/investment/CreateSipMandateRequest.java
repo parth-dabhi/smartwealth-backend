@@ -4,7 +4,6 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Getter
 public class CreateSipMandateRequest {

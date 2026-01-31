@@ -3,7 +3,6 @@ package com.smartwealth.smartwealth_backend.event.handler;
 import com.smartwealth.smartwealth_backend.entity.enums.FailureReasonType;
 import com.smartwealth.smartwealth_backend.entity.enums.InvestmentMode;
 import com.smartwealth.smartwealth_backend.entity.enums.OrderStatus;
-import com.smartwealth.smartwealth_backend.entity.enums.PaymentStatus;
 import com.smartwealth.smartwealth_backend.event.InvestmentOrderFailedEvent;
 import com.smartwealth.smartwealth_backend.event.SipExecutionFailedEvent;
 import com.smartwealth.smartwealth_backend.exception.mutual_fund.*;

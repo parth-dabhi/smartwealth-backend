@@ -50,7 +50,7 @@ public class SipFailureEventHandler {
             // If failure is due to wallet transaction then only increment failure count otherwise only update last failure time
             if (event.getEx() instanceof WalletTransactionException wtxEx && wtxEx.shouldIncrementFailureCount()) {
 
-                Integer newFailureCount = Integer.valueOf(sip.getFailureCount() + 1);
+                Integer newFailureCount = sip.getFailureCount() + 1;
                 sip.setFailureCount(newFailureCount);
 
                 log.warn("SIP failure count incremented. sipId={}, userId={}, newFailureCount={}, reason={}",

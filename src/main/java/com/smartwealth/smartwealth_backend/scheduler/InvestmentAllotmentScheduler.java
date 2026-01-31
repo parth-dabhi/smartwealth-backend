@@ -1,25 +1,14 @@
 package com.smartwealth.smartwealth_backend.scheduler;
 
 import com.smartwealth.smartwealth_backend.dto.common.AllotmentResult;
-import com.smartwealth.smartwealth_backend.entity.investment.InvestmentOrder;
 import com.smartwealth.smartwealth_backend.entity.enums.OrderStatus;
-import com.smartwealth.smartwealth_backend.repository.investment.InvestmentOrderRepository;
-import com.smartwealth.smartwealth_backend.repository.nav.NavHistoryRepository;
-import com.smartwealth.smartwealth_backend.repository.nav.projection.PlanNavProjection;
 import com.smartwealth.smartwealth_backend.service.investment.InvestmentAllotmentExecutor;
-import com.smartwealth.smartwealth_backend.service.investment.InvestmentAllotmentService;
-import com.smartwealth.smartwealth_backend.service.common.TradingHolidayService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
+
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
