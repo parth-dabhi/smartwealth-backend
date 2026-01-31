@@ -2,7 +2,7 @@ package com.smartwealth.smartwealth_backend.dto.response.admin;
 
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
 import com.smartwealth.smartwealth_backend.dto.response.user.AddressResponse;
-import com.smartwealth.smartwealth_backend.entity.User;
+import com.smartwealth.smartwealth_backend.entity.user.User;
 import com.smartwealth.smartwealth_backend.entity.enums.Gender;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
@@ -10,7 +10,6 @@ import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Map;

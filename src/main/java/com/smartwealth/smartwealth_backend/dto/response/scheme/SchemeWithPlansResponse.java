@@ -1,8 +1,8 @@
 package com.smartwealth.smartwealth_backend.dto.response.scheme;
 
 import com.smartwealth.smartwealth_backend.dto.response.plan.PlanSummaryResponse;
-import com.smartwealth.smartwealth_backend.repository.projection.PlanProjection;
-import com.smartwealth.smartwealth_backend.repository.projection.SchemeProjection;
+import com.smartwealth.smartwealth_backend.repository.mutual_fund.projection.PlanProjection;
+import com.smartwealth.smartwealth_backend.repository.mutual_fund.projection.SchemeProjection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

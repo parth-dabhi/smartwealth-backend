@@ -1,6 +1,6 @@
 package com.smartwealth.smartwealth_backend.scheduler;
 
-import com.smartwealth.smartwealth_backend.service.impl.NavImportService;
+import com.smartwealth.smartwealth_backend.service.nav.NavImportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class NavScheduler {
     private final NavImportService navImportService;
 
-    @Scheduled(cron = "0 30 23 ? * MON-FRI", zone = "Asia/Kolkata")
+    @Scheduled(cron = "0 30 23 * * *", zone = "Asia/Kolkata")
     @CacheEvict(value = {"latestNav", "navHistory", "planDetail"}, allEntries = true)
     public void fetchDailyNav() {
         navImportService.importTodayNav();

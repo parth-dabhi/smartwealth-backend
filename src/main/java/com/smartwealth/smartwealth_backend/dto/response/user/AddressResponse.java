@@ -1,6 +1,6 @@
 package com.smartwealth.smartwealth_backend.dto.response.user;
 
-import com.smartwealth.smartwealth_backend.entity.Address;
+import com.smartwealth.smartwealth_backend.entity.user.Address;
 import lombok.*;
 
 @Getter

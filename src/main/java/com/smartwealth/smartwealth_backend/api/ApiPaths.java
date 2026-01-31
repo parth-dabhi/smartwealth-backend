@@ -24,6 +24,7 @@ public final class ApiPaths {
 
     // Auth
     public static final String AUTH = "/auth";
+    public static final String AUTH_ADMIN_LOGIN = "/admin-login";
     public static final String API_AUTH  = API + AUTH;
     public static final String AUTH_LOGIN  = "/login";
     public static final String AUTH_REFRESH  = "/refresh";
@@ -34,6 +35,7 @@ public final class ApiPaths {
     public static final String WALLET_BALANCE = "/balance";
     public static final String WALLET_CREDIT = "/credit";
     public static final String WALLET_DEBIT = "/debit";
+    public static final String WALLET_TRANSACTIONS = "/transactions";
 
     // schemes
     public static final String SCHEMES = "/schemes";
@@ -47,9 +49,33 @@ public final class ApiPaths {
 
     // nav
     public static final String NAV_HISTORY = "/nav-history";
+    public static final String NAVS_BY_DATE = "/by-date";
     public static final String API_NAV_HISTORY = PUBLIC_API + NAV_HISTORY;
 
     // filters
     public static final String FILTERS = "/filters";
     public static final String API_FILTERS = PUBLIC_API + FILTERS;
+
+    // Investment
+    public static final String INVESTMENT = "/investment";
+    public static final String LUMPSUM = "/lumpsum";
+    public static final String SELL = "/sell";
+    public static final String ORDER_HISTORY = "/order-history";
+    public static final String API_INVESTMENT = API + INVESTMENT;
+
+    // SIP
+    public static final String SIP = "/sips";
+    public static final String API_SIP = API + SIP;
+    public static final String SIP_CREATE = "/create";
+    public static final String GET_ALL_SIPS = "/all";
+    public static final String SIP_PAUSE = "/pause";
+    public static final String SIP_CANCEL = "/cancel";
+    public static final String SIP_RESUME = "/resume";
+
+    // portfolio
+    public static final String PORTFOLIO = "/portfolio";
+    public static final String HOLDINGS = "/holdings";
+    public static final String PLAN = "/plan";
+    public static final String TRANSACTIONS = "/transactions";
+    public static final String API_PORTFOLIO = API + PORTFOLIO;
 }

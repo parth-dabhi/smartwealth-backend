@@ -1,7 +1,8 @@
 package com.smartwealth.smartwealth_backend.dto.response.transaction;
 
-import com.smartwealth.smartwealth_backend.entity.Transaction;
+import com.smartwealth.smartwealth_backend.entity.transaction.Transaction;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionCategory;
+import com.smartwealth.smartwealth_backend.entity.enums.TransactionStatus;
 import com.smartwealth.smartwealth_backend.entity.enums.TransactionType;
 import lombok.*;
 import java.math.BigDecimal;
@@ -12,28 +13,30 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class TransactionResponse {
-    Long id;
+    String referenceId;
+    TransactionStatus status;
     TransactionType transactionType;
     TransactionCategory transactionCategory;
     BigDecimal amount;
     BigDecimal balanceBefore;
     BigDecimal balanceAfter;
-    String referenceId;
-    BigDecimal balance;
+    BigDecimal totalBalance;
     BigDecimal lockedBalance;
+    BigDecimal netBalance;
     String message;
 
     public static TransactionResponse fromEntity(Transaction transaction, BigDecimal balance, BigDecimal lockedBalance, String message) {
         return TransactionResponse.builder()
-                .id(transaction.getId())
                 .transactionType(transaction.getTransactionType())
+                .status(transaction.getStatus())
                 .transactionCategory(transaction.getTransactionCategory())
                 .amount(transaction.getAmount())
                 .balanceBefore(transaction.getBalanceBefore())
                 .balanceAfter(transaction.getBalanceAfter())
                 .referenceId(transaction.getReferenceId())
-                .balance(balance)
+                .totalBalance(balance)
                 .lockedBalance(lockedBalance)
+                .netBalance(balance.subtract(lockedBalance))
                 .message(message)
                 .build();
     }

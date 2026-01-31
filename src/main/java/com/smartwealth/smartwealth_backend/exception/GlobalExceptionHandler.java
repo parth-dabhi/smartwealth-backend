@@ -2,19 +2,17 @@ package com.smartwealth.smartwealth_backend.exception;
 
 import com.smartwealth.smartwealth_backend.dto.response.common.ErrorResponse;
 import com.smartwealth.smartwealth_backend.exception.auth.AuthenticationException;
+import com.smartwealth.smartwealth_backend.exception.mutual_fund.*;
 import com.smartwealth.smartwealth_backend.exception.nav.NavHistoryNotFoundException;
-import com.smartwealth.smartwealth_backend.exception.plan.PlanNotFoundException;
 import com.smartwealth.smartwealth_backend.exception.resource.ResourceAlreadyExistsException;
 import com.smartwealth.smartwealth_backend.exception.resource.ResourceNotFoundException;
 import com.smartwealth.smartwealth_backend.exception.transaction.IdempotencyKeyExpiredException;
+import com.smartwealth.smartwealth_backend.exception.transaction.InvalidTransactionStateException;
 import com.smartwealth.smartwealth_backend.exception.transaction.TransactionFailedException;
 import com.smartwealth.smartwealth_backend.exception.user.InactiveAccountException;
 import com.smartwealth.smartwealth_backend.exception.user.KycTransitionException;
 import com.smartwealth.smartwealth_backend.exception.user.KycVerificationException;
-import com.smartwealth.smartwealth_backend.exception.wallet.InsufficientBalanceException;
-import com.smartwealth.smartwealth_backend.exception.wallet.WalletLimitExceededException;
-import com.smartwealth.smartwealth_backend.exception.wallet.WalletNotFoundException;
-import com.smartwealth.smartwealth_backend.exception.wallet.WalletSuspendedException;
+import com.smartwealth.smartwealth_backend.exception.wallet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -190,6 +188,94 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNavDataNotFoundException(NavHistoryNotFoundException ex, HttpServletRequest request) {
         log.warn("NAV data not found: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(SipExecutionFailedException.class)
+    public ResponseEntity<ErrorResponse> handleSipExecutionFailedException(SipExecutionFailedException ex, HttpServletRequest request) {
+        log.warn("SIP execution failed: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(HoldingNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleHoldingNotFoundException(HoldingNotFoundException ex, HttpServletRequest request) {
+        log.warn("Holding not found: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(WalletTransactionException.class)
+    public ResponseEntity<ErrorResponse> handleWalletTransactionException(WalletTransactionException ex, HttpServletRequest request) {
+        log.warn("Wallet transaction error (type: {}): {}", ex.getFailureType(), ex.getMessage());
+
+        HttpStatus status = switch (ex.getFailureType()) {
+            case INSUFFICIENT_BALANCE, IDEMPOTENCY_KEY_EXPIRED, LIMIT_EXCEEDED -> HttpStatus.BAD_REQUEST;
+            case WALLET_NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case WALLET_SUSPENDED -> HttpStatus.FORBIDDEN;
+            case TRANSACTION_FAILED -> HttpStatus.UNPROCESSABLE_ENTITY;
+            case DATABASE_ERROR, UNKNOWN_ERROR -> HttpStatus.CONFLICT;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
+
+        return buildErrorResponse(status, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(SipNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> handleSipNotAllowedException(SipNotAllowedException ex, HttpServletRequest request) {
+        log.warn("SIP not allowed: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidSipConfigurationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSipConfigurationException(InvalidSipConfigurationException ex, HttpServletRequest request) {
+        log.warn("Invalid SIP configuration: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidSellConfigurationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSellConfigurationException(InvalidSellConfigurationException ex, HttpServletRequest request) {
+        log.warn("Invalid SELL configuration: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidBuyConfigurationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidBuyConfigurationException(InvalidBuyConfigurationException ex, HttpServletRequest request) {
+        log.warn("Invalid BUY configuration: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(HoldingUpdateFailedException.class)
+    public ResponseEntity<ErrorResponse> handleHoldingUpdateFailedException(HoldingUpdateFailedException ex, HttpServletRequest request) {
+        log.warn("Holding update failed: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidSellRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSellRequestException(InvalidSellRequestException ex, HttpServletRequest request) {
+        log.warn("Invalid SELL request: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(SipMandateNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSipMandateNotFoundException(SipMandateNotFoundException ex, HttpServletRequest request) {
+        log.warn("SIP Mandate not found: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidSipStateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSipStateException(InvalidSipStateException ex, HttpServletRequest request) {
+        log.warn("Invalid SIP state: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidTransactionStateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTransactionStateException(InvalidTransactionStateException ex, HttpServletRequest request) {
+        log.warn("Invalid transaction state: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidInvestmentOrderException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidInvestmentOrderException(InvalidInvestmentOrderException ex, HttpServletRequest request) {
+        log.warn("Invalid investment order: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {

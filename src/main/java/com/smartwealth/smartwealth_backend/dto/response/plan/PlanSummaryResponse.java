@@ -1,7 +1,7 @@
 package com.smartwealth.smartwealth_backend.dto.response.plan;
 
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
-import com.smartwealth.smartwealth_backend.repository.projection.PlanProjection;
+import com.smartwealth.smartwealth_backend.repository.mutual_fund.projection.PlanProjection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

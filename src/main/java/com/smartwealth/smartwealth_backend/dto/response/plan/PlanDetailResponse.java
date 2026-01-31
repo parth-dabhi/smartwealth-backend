@@ -3,7 +3,7 @@ package com.smartwealth.smartwealth_backend.dto.response.plan;
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
 import com.smartwealth.smartwealth_backend.dto.common.*;
 import com.smartwealth.smartwealth_backend.dto.response.nav.LatestNavDto;
-import com.smartwealth.smartwealth_backend.repository.projection.PlanDetailProjection;
+import com.smartwealth.smartwealth_backend.repository.mutual_fund.projection.PlanDetailProjection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,6 +49,7 @@ public class PlanDetailResponse {
                                 .amcName(p.getAmcName())
                                 .assetName(p.getAssetName())
                                 .categoryName(p.getCategoryName())
+                                .amcWebsite(p.getWebsite())
                                 .build()
                 )
                 .planType(p.getPlanType())
@@ -58,6 +59,7 @@ public class PlanDetailResponse {
                                 .expenseRatio(p.getExpenseRatio())
                                 .minInvestment(p.getMinInvestment())
                                 .minSip(p.getMinSip())
+                                .isSipAllowed(p.getIsSipAllowed())
                                 .exitLoad(p.getExitLoad())
                                 .build()
                 )

@@ -1,7 +1,7 @@
 package com.smartwealth.smartwealth_backend.dto.request.user;
 
 import com.smartwealth.smartwealth_backend.annotation.Adult;
-import com.smartwealth.smartwealth_backend.entity.User;
+import com.smartwealth.smartwealth_backend.entity.user.User;
 import com.smartwealth.smartwealth_backend.entity.enums.Gender;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;

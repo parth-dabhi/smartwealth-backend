@@ -16,6 +16,7 @@ public class Financials {
     private BigDecimal expenseRatio;
     private BigDecimal minInvestment;
     private BigDecimal minSip;
+    private Boolean isSipAllowed;
     private String exitLoad;
 }
 

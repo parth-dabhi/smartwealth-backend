@@ -8,9 +8,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none   # Flyway manages schema
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
 
   flyway:
     enabled: true
@@ -29,4 +27,11 @@ jwt:
 
 smartwealth:
   limits:
-    max-wallet-balance: 1000000.00
+    max-wallet-balance: 10000000.00
+
+idempotency:
+  ttl: ${IDEMPOTENCY_TTL_MINUTES:5}m
+
+sip:
+  failure:
+    max-attempts: 3

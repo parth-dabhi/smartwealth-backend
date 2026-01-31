@@ -46,8 +46,10 @@ public class SecurityConfig {
                         .requestMatchers(ApiPaths.API_AUTH + ApiPaths.AUTH_LOGIN, ApiPaths.API_AUTH + ApiPaths.AUTH_REFRESH).permitAll()
                         .requestMatchers(HttpMethod.POST, ApiPaths.API_USERS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
-                        .requestMatchers("/internal/nav/**").permitAll() // nav import endpoints
+                        .requestMatchers("/api/test/**").permitAll() // test endpoints
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/api/docs/**").permitAll()
 
                         // Preflight (CORS)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

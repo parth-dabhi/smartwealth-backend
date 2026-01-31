@@ -1,6 +1,6 @@
 package com.smartwealth.smartwealth_backend.dto.request.user;
 
-import com.smartwealth.smartwealth_backend.entity.Address;
+import com.smartwealth.smartwealth_backend.entity.user.Address;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;

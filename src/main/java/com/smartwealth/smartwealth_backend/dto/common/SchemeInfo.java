@@ -17,4 +17,5 @@ public class SchemeInfo {
     private String amcName;
     private String assetName;
     private String categoryName;
+    private String amcWebsite;
 }
