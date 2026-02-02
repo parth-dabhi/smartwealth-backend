@@ -78,4 +78,15 @@ public final class ApiPaths {
     public static final String PLAN = "/plan";
     public static final String TRANSACTIONS = "/transactions";
     public static final String API_PORTFOLIO = API + PORTFOLIO;
+    public static final String FAMILY_PORTFOLIO = "/family";
+
+    // family
+    public static final String FAMILY = "/family";
+    public static final String REQUEST = "/request";
+    public static final String PENDING_REQUESTS = "/request/pending";
+    public static final String ACCEPT = "/accept";
+    public static final String REVOKE = "/revoke";
+    public static final String MEMBERS = "/members";
+    public static final String API_FAMILY = API + FAMILY;
+    public static final String ACCEPT_REQUEST = REQUEST + "/{id}" + ACCEPT;
 }

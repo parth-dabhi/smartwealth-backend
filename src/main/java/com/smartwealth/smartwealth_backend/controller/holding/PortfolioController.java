@@ -1,6 +1,7 @@
 package com.smartwealth.smartwealth_backend.controller.holding;
 
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
+import com.smartwealth.smartwealth_backend.dto.response.family_member.FamilyPortfolioSummaryResponse;
 import com.smartwealth.smartwealth_backend.dto.response.investment.HoldingTransactionResponse;
 import com.smartwealth.smartwealth_backend.dto.response.investment.PlanPortfolioResponse;
 import com.smartwealth.smartwealth_backend.dto.response.investment.PortfolioSummaryResponse;
@@ -47,6 +48,16 @@ public class PortfolioController {
     ) {
         return ResponseEntity.ok(
                 portfolioService.getHoldingTransactions(customerId, planId)
+        );
+    }
+
+    @GetMapping(ApiPaths.FAMILY_PORTFOLIO)
+    public ResponseEntity<FamilyPortfolioSummaryResponse> getFamilyPortfolio(
+            @AuthenticationPrincipal String customerId
+    ) {
+        log.info("Fetching combined family portfolio for customerId={}", customerId);
+        return ResponseEntity.ok(
+                portfolioService.getFamilyPortfolio(customerId)
         );
     }
 }
