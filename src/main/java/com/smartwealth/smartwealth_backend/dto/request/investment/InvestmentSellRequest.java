@@ -1,5 +1,6 @@
 package com.smartwealth.smartwealth_backend.dto.request.investment;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -9,8 +10,11 @@ import java.math.BigDecimal;
 @Getter
 public class InvestmentSellRequest {
 
-    @NotNull
+    @NotNull(message = "planId must be provided")
     private Integer planId;
+
+    @NotNull(message = "folioNumber must be provided")
+    private String folioNumber;
 
     /**
      * Sell by amount (₹).

@@ -5,7 +5,6 @@ import com.smartwealth.smartwealth_backend.dto.response.user.AddressResponse;
 import com.smartwealth.smartwealth_backend.entity.user.User;
 import com.smartwealth.smartwealth_backend.entity.enums.Gender;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
-import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +28,7 @@ public class AdminUserDetailResponse {
 
     private UserRole role;
     private KycStatus kycStatus;
-    private RiskProfile riskProfile;
+    private String riskProfile;
 
     private boolean isActive;
     private OffsetDateTime createdAt;
@@ -40,7 +39,7 @@ public class AdminUserDetailResponse {
      */
     private Map<String, String> _links;
 
-    public static AdminUserDetailResponse from(User user) {
+    public static AdminUserDetailResponse from(User user, String riskProfile) {
         return AdminUserDetailResponse.builder()
                 .customerId(user.getCustomerId())
                 .fullName(user.getFullName())
@@ -61,7 +60,7 @@ public class AdminUserDetailResponse {
                 )
                 .role(user.getRole())
                 .kycStatus(user.getKycStatus())
-                .riskProfile(user.getRiskProfile())
+                .riskProfile(riskProfile)
                 .isActive(user.isActive())
                 .createdAt(user.getCreatedAt())
                 .lastLoginAt(user.getLastLoginAt())

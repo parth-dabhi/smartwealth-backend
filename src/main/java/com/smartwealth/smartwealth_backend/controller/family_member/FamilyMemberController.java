@@ -2,6 +2,7 @@ package com.smartwealth.smartwealth_backend.controller.family_member;
 
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
 import com.smartwealth.smartwealth_backend.dto.request.family_member.FamilyAccessRequestDto;
+import com.smartwealth.smartwealth_backend.dto.request.family_member.FamilyRevokeAccessDto;
 import com.smartwealth.smartwealth_backend.dto.response.family_member.FamilyActionResponse;
 import com.smartwealth.smartwealth_backend.dto.response.family_member.FamilyMemberListResponse;
 import com.smartwealth.smartwealth_backend.dto.response.family_member.PendingFamilyResponseDto;
@@ -52,23 +53,41 @@ public class FamilyMemberController {
         );
     }
 
-    @PostMapping(ApiPaths.REVOKE)
-    public ResponseEntity<FamilyActionResponse> revokeAccess(
-            @AuthenticationPrincipal String ownerCustomerId,
-            @RequestBody FamilyAccessRequestDto dto
+    @PostMapping(ApiPaths.REMOVE_ACCESSIBLE_FAMILY_MEMBER)
+        public ResponseEntity<FamilyActionResponse> removeAccessibleFamilyMember(
+            @RequestBody FamilyRevokeAccessDto dto
     ) {
         return ResponseEntity.ok(
-                familyMemberService.revokeAccess(ownerCustomerId, dto.getMemberCustomerId())
+                familyMemberService.removeAccessibleFamilyMember(dto.getFamilyMemberId())
         );
     }
 
-    @GetMapping(ApiPaths.MEMBERS)
-    public ResponseEntity<List<FamilyMemberListResponse>> getFamilyMembers(
+    @PostMapping(ApiPaths.REVOKE_FAMILY_MEMBER_ACCESS_TO_ME)
+    public ResponseEntity<FamilyActionResponse> revokeFamilyMemberAccessToMe(
+            @RequestBody FamilyRevokeAccessDto dto
+    ) {
+        return ResponseEntity.ok(
+                familyMemberService.revokeFamilyMemberAccessToMe(dto.getFamilyMemberId())
+        );
+    }
+
+    @GetMapping(ApiPaths.ACCESSIBLE_MEMBERS)
+    public ResponseEntity<List<FamilyMemberListResponse>> getAllFamilyMemberWhoIHaveAccess(
             @AuthenticationPrincipal String customerId
     ) {
         log.info("Fetching family members");
         return ResponseEntity.ok(
-            familyMemberService.getAllFamilyMember(customerId)
+            familyMemberService.getAllFamilyMemberWhoIHaveAccess(customerId)
+        );
+    }
+
+    @GetMapping(ApiPaths.MEMBERS_WITH_ACCESS_TO_ME)
+    public ResponseEntity<List<FamilyMemberListResponse>> getAllFamilyMembersWhoHaveAccessToMe(
+            @AuthenticationPrincipal String customerId
+    ) {
+        log.info("Fetching family members of me");
+        return ResponseEntity.ok(
+                familyMemberService.getAllFamilyMembersWhoHaveAccessToMe(customerId)
         );
     }
 }

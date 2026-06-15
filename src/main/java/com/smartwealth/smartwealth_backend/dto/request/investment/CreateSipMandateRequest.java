@@ -1,16 +1,26 @@
 package com.smartwealth.smartwealth_backend.dto.request.investment;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class CreateSipMandateRequest {
 
     @NotNull(message = "Plan ID is required")
     @Positive(message = "Plan ID must be a positive number")
     private Integer planId;
+
+    @Nullable
+    private String folioNumber;  // null = create new folio for this SIP
 
     @NotNull(message = "SIP amount is required")
     @Min(value = 10, message = "SIP amount must be at least 10")

@@ -9,6 +9,7 @@ import com.smartwealth.smartwealth_backend.exception.mutual_fund.HoldingUpdateFa
 import com.smartwealth.smartwealth_backend.exception.mutual_fund.InvalidSellRequestException;
 import com.smartwealth.smartwealth_backend.repository.holding.UserHoldingRepository;
 import com.smartwealth.smartwealth_backend.repository.holding.projection.HoldingIdProjection;
+import com.smartwealth.smartwealth_backend.repository.holding.projection.UserHoldingProjection;
 import com.smartwealth.smartwealth_backend.repository.nav.projection.PlanNavProjection;
 import com.smartwealth.smartwealth_backend.repository.holding.projection.UserHoldingSellProjection;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +29,12 @@ public class UserHoldingServiceImpl implements UserHoldingService {
 
     private final UserHoldingRepository userHoldingRepository;
     private final HoldingTransactionService holdingTransactionService;
+    private final FolioNumberGeneratorService folioNumberGeneratorService;
 
     private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 
     @Override
-    public void updateUserHoldingsForBuy(
+    public Long updateUserHoldingsForBuy(
             InvestmentOrder order,
             BigDecimal unitsToBuy,
             PlanNavProjection nav,
@@ -42,20 +44,14 @@ public class UserHoldingServiceImpl implements UserHoldingService {
         Long userId = order.getUserId();
         Integer planId = order.getPlanId();
         BigDecimal investedAmount = order.getAmount();
-        Long holdingId;
+        Long holdingId = order.getHoldingId();
 
-        // Fetch existing holding
-        Optional<HoldingIdProjection> existingHoldingId =
-                userHoldingRepository.findByUserIdAndPlanId(
-                        userId,
-                        planId,
-                        HoldingIdProjection.class
-                );
+        if (holdingId != null) {
 
-        if (existingHoldingId.isPresent()) {
-            holdingId = existingHoldingId.get().getHoldingId();
-            // Update existing holding
+            // EXISTING FOLIO FLOW
+
             int rowsUpdated = userHoldingRepository.updateUserHoldingUnitsForBuy(
+                    holdingId,
                     userId,
                     planId,
                     unitsToBuy,
@@ -64,18 +60,23 @@ public class UserHoldingServiceImpl implements UserHoldingService {
             );
 
             if (rowsUpdated == 0) {
-                log.error("Failed to update user holding. userId={}, planId={}", userId, planId);
-                throw new HoldingUpdateFailedException("Failed to update user holding");
+                throw new HoldingUpdateFailedException("Holding not found for id=" + holdingId);
             }
-            log.info("User holding updated. userId={}, planId={}, newUnits={}", userId, planId, unitsToBuy);
+
+            log.info("Updated existing holding. holdingId={}, units={}", holdingId, unitsToBuy);
 
         } else {
-            // Create new holding
+
+            // NEW FOLIO FLOW
+
+            String folioNumber = folioNumberGeneratorService.generateFolioNumber();
+
             UserHolding holding = UserHolding.builder()
-                    .userId(userId)
-                    .planId(planId)
+                    .userId(order.getUserId())
+                    .planId(order.getPlanId())
+                    .folioNumber(folioNumber)
                     .totalUnits(unitsToBuy)
-                    .totalInvestedAmount(order.getAmount())
+                    .totalInvestedAmount(investedAmount)
                     .totalRedeemedAmount(BigDecimal.ZERO)
                     .isActive(true)
                     .createdAt(OffsetDateTime.now(IST))
@@ -83,8 +84,10 @@ public class UserHoldingServiceImpl implements UserHoldingService {
                     .build();
 
             UserHolding savedHolding = userHoldingRepository.save(holding);
-            holdingId = savedHolding.getHoldingId();
-            log.info("New user holding created. userId={}, planId={}, units={}", userId, planId, unitsToBuy);
+
+            holdingId = savedHolding.getHoldingId(); // Get the generated holding ID
+
+            order.setHoldingId(holdingId); // Update the order with the new holding ID for transaction record creation
         }
 
         // Create holding transaction record
@@ -97,6 +100,8 @@ public class UserHoldingServiceImpl implements UserHoldingService {
                 investmentMode,
                 nav
         );
+
+        return holdingId; // Return the holding ID for both existing and new folio flows
     }
 
     @Override
@@ -109,25 +114,15 @@ public class UserHoldingServiceImpl implements UserHoldingService {
     ) {
         Long userId = order.getUserId();
         Integer planId = order.getPlanId();
+        Long holdingId = order.getHoldingId();
 
-        Optional<HoldingIdProjection> existingHoldingId =
-                userHoldingRepository.findByUserIdAndPlanId(
-                        userId,
-                        planId,
-                        HoldingIdProjection.class
-                );
-
-        if (existingHoldingId.isEmpty()) {
-            log.error("No existing holding found for sell operation. userId={}, planId={}", userId, planId);
-            throw new HoldingNotFoundException("No existing holding found for sell operation");
+        if (holdingId == null) {
+            throw new InvalidSellRequestException("Holding ID is required for SELL");
         }
-
-        Long holdingId = existingHoldingId.get().getHoldingId();
 
         // Update existing holding
         int rowsUpdated = userHoldingRepository.updateUserHoldingUnitsForSell(
-                userId,
-                planId,
+                holdingId,
                 unitsToSell,
                 redeemedAmount,
                 OffsetDateTime.now(IST)
@@ -138,7 +133,7 @@ public class UserHoldingServiceImpl implements UserHoldingService {
             throw new HoldingUpdateFailedException("Failed to update user holding for sell");
         }
 
-        log.info("User holding updated for sell. userId={}, planId={}, unitsSold={}", userId, planId, unitsToSell);
+        log.info("Holding updated for SELL. holdingId={}, unitsSold={}", holdingId, unitsToSell);
 
         // Create holding transaction record
         holdingTransactionService.createHoldingTransactionRecord (
@@ -152,14 +147,12 @@ public class UserHoldingServiceImpl implements UserHoldingService {
         );
     }
 
-    @Override
-    public UserHoldingSellProjection getHoldingForSell(
-            Long userId,
-            Integer planId
+    private UserHoldingSellProjection getHoldingForSell(
+            Long holdingId
     ) {
-        return userHoldingRepository.findByUserIdAndPlanId(userId, planId, UserHoldingSellProjection.class)
+        return userHoldingRepository.findByHoldingId(holdingId, UserHoldingSellProjection.class)
                 .orElseThrow(() -> {
-                    log.error("No holding found for userId={}, planId={}", userId, planId);
+                    log.error("No holding found for holdingId: {}", holdingId);
                     return new HoldingNotFoundException("No holding found for the given user and plan");
                 });
     }
@@ -191,11 +184,10 @@ public class UserHoldingServiceImpl implements UserHoldingService {
 
     @Override
     public void validateSufficientHoldings(
-            Long userId,
-            Integer planId,
+            Long holdingId,
             BigDecimal unitsToSell
     ) {
-        UserHoldingSellProjection holding = getHoldingForSell(userId, planId);
+        UserHoldingSellProjection holding = getHoldingForSell(holdingId);
 
         if (holding == null || !holding.getIsActive()) {
             log.warn("No active holding found for SELL.");
@@ -210,5 +202,17 @@ public class UserHoldingServiceImpl implements UserHoldingService {
             );
             throw new InvalidSellRequestException("SELL exceeds holding units");
         }
+    }
+
+    @Override
+    public UserHoldingProjection getHoldingFromFolioNumber(
+            String folioNumber,
+            Long userId
+    ) {
+        return userHoldingRepository.findHoldingByFolioNumber(folioNumber, userId)
+                .orElseThrow(() -> {
+                    log.error("No holding found for folio number: {}", folioNumber);
+                    return new HoldingNotFoundException("No holding found for the given folio number");
+                });
     }
 }

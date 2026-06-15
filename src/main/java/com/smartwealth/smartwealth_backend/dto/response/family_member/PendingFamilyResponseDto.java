@@ -14,7 +14,6 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class PendingFamilyResponseDto {
     Long requestId;
-    Long requesterId;
     String requesterName;
     OffsetDateTime requestedAt;
 
@@ -23,7 +22,6 @@ public class PendingFamilyResponseDto {
     ) {
         PendingFamilyResponseDto dto = new PendingFamilyResponseDto();
         dto.setRequestId(projection.getId());
-        dto.setRequesterId(projection.getRequesterId());
         dto.setRequesterName(projection.getRequesterName());
         dto.setRequestedAt(projection.getCreatedAt());
         return dto;

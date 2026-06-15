@@ -14,6 +14,8 @@ import com.smartwealth.smartwealth_backend.repository.investment.InvestmentAllot
 import com.smartwealth.smartwealth_backend.repository.investment.InvestmentOrderRepository;
 import com.smartwealth.smartwealth_backend.repository.sip.SipMandateRepository;
 import com.smartwealth.smartwealth_backend.repository.nav.projection.PlanNavProjection;
+import com.smartwealth.smartwealth_backend.service.goal.GoalInvestmentService;
+import com.smartwealth.smartwealth_backend.service.goal.UserGoalService;
 import com.smartwealth.smartwealth_backend.service.sip.SipExecutionServiceImpl;
 import com.smartwealth.smartwealth_backend.service.holding.UserHoldingService;
 import com.smartwealth.smartwealth_backend.service.wallet.WalletService;
@@ -40,6 +42,7 @@ public class InvestmentAllotmentServiceImpl implements InvestmentAllotmentServic
     private final SipMandateRepository sipMandateRepository;
     private final UserHoldingService userHoldingService;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserGoalService userGoalService;
 
     private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 
@@ -112,7 +115,7 @@ public class InvestmentAllotmentServiceImpl implements InvestmentAllotmentServic
                     .divide(nav.getNavValue(), 8, RoundingMode.HALF_UP);
 
             // Update User holdings
-            userHoldingService.updateUserHoldingsForBuy(
+            Long holdingId = userHoldingService.updateUserHoldingsForBuy(
                     order,
                     units,
                     nav,
@@ -134,9 +137,10 @@ public class InvestmentAllotmentServiceImpl implements InvestmentAllotmentServic
 
             // SIP lifecycle update
             if (order.getInvestmentMode().equals(InvestmentMode.SIP)) {
-                updateSipMandateAfterAllotment(order);
+                updateSipMandateAfterAllotment(order, holdingId);
             }
 
+            order.setHoldingId(holdingId); // it may contain existing holdingId or new holdingId based on whether user is investing first time or not in that plan
             order.setPaymentReferenceId(lockedDebitTxn.getReferenceId());
             order.setUnits(units);
             order.setStatus(OrderStatus.ALLOTTED); // Update order status
@@ -145,6 +149,9 @@ public class InvestmentAllotmentServiceImpl implements InvestmentAllotmentServic
 
             // Save order updates
             investmentOrderRepository.save(order);
+
+            // Update goal tracking
+            userGoalService.updateGoalOnAllotment(order, amount);
 
             return 1; // One allotment created
 
@@ -177,6 +184,7 @@ public class InvestmentAllotmentServiceImpl implements InvestmentAllotmentServic
         try {
 
             BigDecimal amount = order.getAmount();
+            Long holdingId = order.getHoldingId();
 
             if (!InvestmentMode.LUMPSUM.equals(order.getInvestmentMode())) {
                 log.error("SELL orders cannot be SIP. orderId={}", order.getInvestmentOrderId());
@@ -215,7 +223,7 @@ public class InvestmentAllotmentServiceImpl implements InvestmentAllotmentServic
             }
 
             // Validate against holdings
-            userHoldingService.validateSufficientHoldings(order.getUserId(), order.getPlanId(), unitsToSell);
+            userHoldingService.validateSufficientHoldings(holdingId, unitsToSell);
 
             // Credit amount to user's wallet
             TransactionResponse creditedTxn = walletService.creditWallet(
@@ -275,8 +283,14 @@ public class InvestmentAllotmentServiceImpl implements InvestmentAllotmentServic
         return 1; // One sell order processed
     }
 
-    private void updateSipMandateAfterAllotment(InvestmentOrder order) {
+    private void updateSipMandateAfterAllotment(InvestmentOrder order, Long holdingId) {
         sipMandateRepository.findById(order.getSipMandateId()).ifPresent(sip -> {
+
+            // is sip first installment?
+
+            if (sip.getHoldingId() == null) {
+                sip.setHoldingId(holdingId);
+            }
 
             sip.setCompletedInstallments(Integer.valueOf(sip.getCompletedInstallments() + 1));
             sip.setLastRunAt(OffsetDateTime.now(IST));

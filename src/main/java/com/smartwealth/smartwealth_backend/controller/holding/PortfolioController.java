@@ -33,21 +33,21 @@ public class PortfolioController {
 
     @GetMapping(ApiPaths.PLAN)
     public ResponseEntity<PlanPortfolioResponse> getPlanPortfolio(
-            @RequestParam Integer planId,
+            @RequestParam String folioNumber,
             @AuthenticationPrincipal String customerId
     ) {
         return ResponseEntity.ok(
-                portfolioService.getPlanPortfolio(customerId, planId)
+                portfolioService.getPlanPortfolio(customerId, folioNumber)
         );
     }
 
     @GetMapping(ApiPaths.TRANSACTIONS)
     public ResponseEntity<List<HoldingTransactionResponse>> getHoldingTransactions(
-            @RequestParam Integer planId,
+            @RequestParam String folioNumber,
             @AuthenticationPrincipal String customerId
     ) {
         return ResponseEntity.ok(
-                portfolioService.getHoldingTransactions(customerId, planId)
+                portfolioService.getHoldingTransactions(customerId, folioNumber)
         );
     }
 
@@ -58,6 +58,17 @@ public class PortfolioController {
         log.info("Fetching combined family portfolio for customerId={}", customerId);
         return ResponseEntity.ok(
                 portfolioService.getFamilyPortfolio(customerId)
+        );
+    }
+
+    @GetMapping(ApiPaths.FOLIOS)
+    public ResponseEntity<List<String>> getFoliosForPlanOfUser(
+            @AuthenticationPrincipal String customerId,
+            @RequestParam Integer planId
+    ) {
+        log.info("Fetching folios for customerId={}, planId={}", customerId, planId);
+        return ResponseEntity.ok(
+                portfolioService.getFoliosForPlanOfUser(customerId, planId)
         );
     }
 }

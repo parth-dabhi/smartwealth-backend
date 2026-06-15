@@ -34,6 +34,9 @@ public class SipMandate {
     @Column(name = "plan_id", nullable = false)
     private Integer planId;
 
+    @Column(name = "holding_id")
+    private Long holdingId;
+
     @Column(name = "sip_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal sipAmount;
 

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>KYC Status Update — SmartWealth</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #f4f6f8; font-family: 'Segoe UI', Arial, sans-serif; }
+        .wrapper { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .header { padding: 40px 32px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; }
+        .header p { color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 15px; }
+        .body { padding: 36px 32px; }
+        .greeting { font-size: 20px; color: #1a1a2e; font-weight: 600; margin-bottom: 12px; }
+        .text { color: #4a5568; font-size: 15px; line-height: 1.7; margin-bottom: 24px; }
+        .footer { background: #f4f6f8; padding: 24px 32px; text-align: center; border-top: 1px solid #e2e8f0; }
+        .footer p { color: #718096; font-size: 12px; margin: 4px 0; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <!-- VERIFIED header -->
+    <div class="header" th:if="${status == 'VERIFIED'}" style="background: #1a73e8;">
+        <h1>✅ KYC Verified</h1>
+        <p>SmartWealth Account Update</p>
+    </div>
+
+    <!-- REJECTED header -->
+    <div class="header" th:if="${status == 'REJECTED'}" style="background: #e53935;">
+        <h1>❌ KYC Rejected</h1>
+        <p>SmartWealth Account Update</p>
+    </div>
+
+    <div class="body">
+
+        <p class="greeting">Hi, <span th:text="${fullName}">User</span></p>
+
+        <!-- VERIFIED message -->
+        <p class="text" th:if="${status == 'VERIFIED'}">
+            Great news! Your KYC verification is complete. Your SmartWealth account
+            is now fully activated and you can start investing in mutual funds right away.
+        </p>
+
+        <!-- REJECTED message -->
+        <p class="text" th:if="${status == 'REJECTED'}">
+            Unfortunately, we could not verify your KYC details at this time.
+            Please review the information below and re-submit with the correct documents.
+        </p>
+
+        <!-- Account Details -->
+        <div style="margin-bottom:28px;">
+            <p style="margin:8px 0; font-size:14px; color:#4a5568;"><strong style="color:#1a1a2e;">Customer ID:</strong> <span th:text="${customerId}">SW000001</span></p>
+            <p style="margin:8px 0; font-size:14px; color:#4a5568;"><strong style="color:#1a1a2e;">KYC Status:</strong> <span th:text="${status}">VERIFIED</span></p>
+            <p th:if="${remark != null and !#strings.isEmpty(remark)}" style="margin:8px 0; font-size:14px; color:#4a5568;"><strong style="color:#1a1a2e;">Remark:</strong> <span th:text="${remark}">—</span></p>
+            <p style="margin:8px 0; font-size:14px; color:#4a5568;"><strong style="color:#1a1a2e;">Updated On:</strong> <span th:text="${updatedAt}">19 Apr 2026</span></p>
+        </div>
+
+        <!-- VERIFIED next steps -->
+        <div th:if="${status == 'VERIFIED'}">
+            <p class="text" style="margin-bottom:16px;"><strong>You're all set. Here's what you can do now:</strong></p>
+
+            <div style="margin-bottom:16px;">
+                <span style="font-size:18px;">💰</span>
+                <span style="color:#4a5568; font-size:14px; margin-left:10px;"><strong style="color:#1a1a2e;">Add money to your wallet</strong> — Fund your account to start placing orders.</span>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <span style="font-size:18px;">🎯</span>
+                <span style="color:#4a5568; font-size:14px; margin-left:10px;"><strong style="color:#1a1a2e;">Set an investment goal</strong> — Let SmartWealth recommend the right funds for you.</span>
+            </div>
+
+            <div style="margin-bottom:28px;">
+                <span style="font-size:18px;">📈</span>
+                <span style="color:#4a5568; font-size:14px; margin-left:10px;"><strong style="color:#1a1a2e;">Start a SIP</strong> — Invest a fixed amount every month automatically.</span>
+            </div>
+
+            <div style="text-align:center; margin:32px 0 8px;">
+                <a href="#" style="background:#1a73e8; color:#ffffff; text-decoration:none; padding:14px 36px; border-radius:8px; font-size:15px; font-weight:600; display:inline-block;">
+                    Start Investing →
+                </a>
+            </div>
+        </div>
+
+        <!-- REJECTED next steps -->
+        <div th:if="${status == 'REJECTED'}">
+            <p class="text" style="margin-bottom:16px;"><strong>Steps to re-submit your KYC:</strong></p>
+
+            <div style="margin-bottom:16px;">
+                <span style="font-size:18px;">📄</span>
+                <span style="color:#4a5568; font-size:14px; margin-left:10px;"><strong style="color:#1a1a2e;">Check your documents</strong> — Ensure PAN and Aadhaar are valid and clearly legible.</span>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <span style="font-size:18px;">✏️</span>
+                <span style="color:#4a5568; font-size:14px; margin-left:10px;"><strong style="color:#1a1a2e;">Correct any details</strong> — Name, date of birth, and address must match your documents exactly.</span>
+            </div>
+
+            <div style="margin-bottom:28px;">
+                <span style="font-size:18px;">🔄</span>
+                <span style="color:#4a5568; font-size:14px; margin-left:10px;"><strong style="color:#1a1a2e;">Re-submit via the app</strong> — Go to Profile → KYC and upload again.</span>
+            </div>
+
+            <div style="text-align:center; margin:32px 0 8px;">
+                <a href="#" style="background:#e53935; color:#ffffff; text-decoration:none; padding:14px 36px; border-radius:8px; font-size:15px; font-weight:600; display:inline-block;">
+                    Re-submit KYC →
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>This is an automated message. Please do not reply to this email.</p>
+        <p>© 2026 SmartWealth. All rights reserved.</p>
+    </div>
+
+</div>
+</body>
+</html>

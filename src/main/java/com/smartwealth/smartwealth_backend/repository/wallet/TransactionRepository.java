@@ -42,9 +42,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     UPDATE Transaction t
     SET t.status = :status,
         t.description = :description,
-        t.balanceAfter = :balanceAfter
+        t.balanceAfter = :balanceAfter,
+        t.idempotencyKey = CONCAT(t.idempotencyKey, '-FAILED')
     WHERE t.id = :id
-""")
+""") // Append '-FAILED' to idempotency key to prevent future duplicates with the same key
     int markOrderFailed(
             @Param("id") Long id,
             @Param("status") TransactionStatus status,

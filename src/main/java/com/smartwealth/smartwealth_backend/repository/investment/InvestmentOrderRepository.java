@@ -55,6 +55,7 @@ public interface InvestmentOrderRepository extends JpaRepository<InvestmentOrder
     @Query("""
     SELECT
         io.investmentOrderId AS investmentOrderId,
+        uh.folioNumber AS folioNumber,
         sp.planName AS planName,
         io.investmentType AS investmentType,
         io.investmentMode AS investmentMode,
@@ -70,6 +71,8 @@ public interface InvestmentOrderRepository extends JpaRepository<InvestmentOrder
          ON io.planId = sp.planId
     LEFT JOIN HoldingTransaction ht
          ON ht.investmentOrderId = io.investmentOrderId
+    LEFT JOIN UserHolding uh
+         ON uh.holdingId = io.holdingId
     WHERE io.userId = :userId
     ORDER BY io.orderTime DESC
 """)
@@ -77,6 +80,4 @@ public interface InvestmentOrderRepository extends JpaRepository<InvestmentOrder
             @Param("userId") Long userId,
             Pageable pageable
     );
-
-
 }

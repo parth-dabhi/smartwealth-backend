@@ -7,9 +7,11 @@ import com.smartwealth.smartwealth_backend.dto.response.family_member.PendingFam
 import java.util.List;
 
 public interface FamilyMemberService {
-    List<FamilyMemberListResponse> getAllFamilyMember(String viewerCustomerId);
+    List<FamilyMemberListResponse> getAllFamilyMemberWhoIHaveAccess(String viewerCustomerId);
+    List<FamilyMemberListResponse> getAllFamilyMembersWhoHaveAccessToMe(String ownerCustomerId);
     FamilyActionResponse sendRequest(String requesterCustomerId, String memberCustomerId);
     FamilyActionResponse  acceptRequest(String memberCustomerId, Long requestId);
     List<PendingFamilyResponseDto> getPendingRequests(String memberCustomerId);
-    FamilyActionResponse  revokeAccess(String ownerCustomerId, String viewerCustomerId);
+    FamilyActionResponse  removeAccessibleFamilyMember(Long familyMemberId);
+    FamilyActionResponse revokeFamilyMemberAccessToMe(Long familyMemberId);
 }

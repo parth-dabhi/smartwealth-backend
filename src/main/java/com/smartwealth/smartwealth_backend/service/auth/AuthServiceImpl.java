@@ -1,5 +1,6 @@
 package com.smartwealth.smartwealth_backend.service.auth;
 
+import com.smartwealth.smartwealth_backend.dto.common.RiskProfileDto;
 import com.smartwealth.smartwealth_backend.dto.request.auth.RefreshTokenRequest;
 import com.smartwealth.smartwealth_backend.dto.request.auth.UserLoginRequest;
 import com.smartwealth.smartwealth_backend.dto.response.auth.AuthResponse;
@@ -9,6 +10,7 @@ import com.smartwealth.smartwealth_backend.entity.user.User;
 import com.smartwealth.smartwealth_backend.exception.auth.AuthenticationException;
 import com.smartwealth.smartwealth_backend.repository.user.UserRepository;
 import com.smartwealth.smartwealth_backend.security.JwtTokenProvider;
+import com.smartwealth.smartwealth_backend.service.user.RiskProfileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -25,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RiskProfileService riskProfileService;
 
     @Override
     @Transactional(timeout = 5)
@@ -69,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
                 accessToken,
                 refreshToken,
                 jwtTokenProvider.getAccessTokenExpiry(),
-                UserAuthResponse.toResponse(user, previousLoginAt)
+                UserAuthResponse.toResponse(user, getRiskProfileName(user.getRiskProfileId()), previousLoginAt)
         );
     }
 
@@ -100,5 +104,9 @@ public class AuthServiceImpl implements AuthService {
                         jwtTokenProvider.generateRefreshToken(user.getCustomerId())
                 )
                 .build();
+    }
+
+    public String getRiskProfileName(Integer riskProfileId) {
+        return riskProfileService.getById(riskProfileId).getName();
     }
 }

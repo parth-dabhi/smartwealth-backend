@@ -1,5 +1,6 @@
 package com.smartwealth.smartwealth_backend.service.investment;
 
+import com.smartwealth.smartwealth_backend.dto.request.investment.CreateSipMandateRequest;
 import com.smartwealth.smartwealth_backend.dto.request.investment.InvestmentBuyRequest;
 import com.smartwealth.smartwealth_backend.dto.request.investment.InvestmentSellRequest;
 import com.smartwealth.smartwealth_backend.dto.response.common.PageMetaResponse;
@@ -14,6 +15,7 @@ import com.smartwealth.smartwealth_backend.exception.mutual_fund.InvalidBuyConfi
 import com.smartwealth.smartwealth_backend.exception.mutual_fund.InvalidSellConfigurationException;
 import com.smartwealth.smartwealth_backend.exception.mutual_fund.PlanNotFoundException;
 import com.smartwealth.smartwealth_backend.exception.transaction.TransactionFailedException;
+import com.smartwealth.smartwealth_backend.repository.holding.projection.UserHoldingProjection;
 import com.smartwealth.smartwealth_backend.repository.investment.InvestmentOrderRepository;
 import com.smartwealth.smartwealth_backend.repository.nav.NavHistoryRepository;
 import com.smartwealth.smartwealth_backend.repository.mutual_fund.SchemePlanRepository;
@@ -24,11 +26,13 @@ import com.smartwealth.smartwealth_backend.service.nav.NavCutoffService;
 import com.smartwealth.smartwealth_backend.service.holding.UserHoldingService;
 import com.smartwealth.smartwealth_backend.service.user.UserService;
 import com.smartwealth.smartwealth_backend.service.wallet.WalletService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -54,7 +58,7 @@ public class InvestmentServiceImpl implements InvestmentService {
     private static final String KEY_PREFIX_IDEMPOTENCY = "investment:idempotency:";
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public InvestmentBuyResponse buy(InvestmentBuyRequest request, String customerId, String idempotencyKey) {
 
         // Check for idempotent request
@@ -77,6 +81,7 @@ public class InvestmentServiceImpl implements InvestmentService {
             validateBuy(request);
 
             Long userId = getUserId(customerId);
+            Long holdingId = getHoldingId(request.getFolioNumber(), userId, request.getPlanId());
 
             OffsetDateTime now = OffsetDateTime.now(IST);
 
@@ -105,6 +110,7 @@ public class InvestmentServiceImpl implements InvestmentService {
                     .userId(userId)
                     .planId(request.getPlanId())
                     .sipMandateId(null) // LUMPSUM
+                    .holdingId(holdingId)
                     .investmentType(InvestmentType.BUY)
                     .investmentMode(InvestmentMode.LUMPSUM)
                     .amount(request.getAmount())
@@ -168,6 +174,7 @@ public class InvestmentServiceImpl implements InvestmentService {
             validateSell(request);
 
             Long userId = getUserId(customerId);
+            Long holdingId = getHoldingId(request.getFolioNumber(), userId, request.getPlanId());
             Integer planId = request.getPlanId();
 
             LatestNavProjection navLatest = navHistoryRepository.findLatestNavByPlanId(planId)
@@ -177,7 +184,7 @@ public class InvestmentServiceImpl implements InvestmentService {
                     request.getUnits() : userHoldingService.getUnitsToSell(request.getAmount(), navLatest.getNavValue());
 
             // validate sufficient holdings based on requested units(amount) to sell
-            userHoldingService.validateSufficientHoldings(userId, request.getPlanId(), unitsToSell);
+            userHoldingService.validateSufficientHoldings(holdingId, unitsToSell);
 
             OffsetDateTime now = OffsetDateTime.now(IST);
 
@@ -245,6 +252,7 @@ public class InvestmentServiceImpl implements InvestmentService {
                 .stream()
                 .map(p -> OrderHistoryResponse.builder()
                         .investmentOrderId(p.getInvestmentOrderId())
+                        .folioNumber(p.getFolioNumber())
                         .planName(p.getPlanName())
                         .investmentType(p.getInvestmentType())
                         .investmentMode(p.getInvestmentMode())
@@ -263,6 +271,28 @@ public class InvestmentServiceImpl implements InvestmentService {
                 .meta(PageMetaResponse.from(page))
                 .data(data)
                 .build();
+    }
+
+    @Nullable
+    private Long getHoldingId(String folioNumber, Long userId, Integer planId) {
+        Long holdingId = null;
+
+        if (folioNumber != null && !folioNumber.isBlank()) {
+
+            UserHoldingProjection holding = userHoldingService
+                    .getHoldingFromFolioNumber(folioNumber, userId);
+
+            if (holding == null) {
+                throw new IllegalArgumentException("Invalid folio number");
+            }
+
+            if (!holding.getPlanId().equals(planId)) {
+                throw new IllegalArgumentException("Folio does not belong to selected plan");
+            }
+
+            holdingId = holding.getHoldingId();
+        }
+        return holdingId;
     }
 
     private void validateBuy(InvestmentBuyRequest r) {

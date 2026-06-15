@@ -14,6 +14,7 @@ public class PlanPortfolioResponse {
 
     private Integer planId;
     private String planName;
+    private String folioNumber;
 
     private String amcName;
     private String assetName;

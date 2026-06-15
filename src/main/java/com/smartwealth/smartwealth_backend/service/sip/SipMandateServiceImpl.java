@@ -3,18 +3,23 @@ package com.smartwealth.smartwealth_backend.service.sip;
 import com.smartwealth.smartwealth_backend.dto.request.investment.CreateSipMandateRequest;
 import com.smartwealth.smartwealth_backend.dto.response.investment.ListAllSipMandateResponse;
 import com.smartwealth.smartwealth_backend.dto.response.investment.SipMandateResponse;
+import com.smartwealth.smartwealth_backend.entity.holding.UserHolding;
 import com.smartwealth.smartwealth_backend.entity.investment.SipMandate;
 import com.smartwealth.smartwealth_backend.entity.enums.SipStatus;
 import com.smartwealth.smartwealth_backend.exception.mutual_fund.*;
+import com.smartwealth.smartwealth_backend.repository.holding.projection.UserHoldingProjection;
 import com.smartwealth.smartwealth_backend.repository.mutual_fund.SchemePlanRepository;
 import com.smartwealth.smartwealth_backend.repository.mutual_fund.projection.PlanSipConfigProjection;
 import com.smartwealth.smartwealth_backend.repository.sip.SipMandateRepository;
 import com.smartwealth.smartwealth_backend.repository.sip.projection.SipResumeProjection;
 import com.smartwealth.smartwealth_backend.repository.sip.projection.SipStatusProjection;
+import com.smartwealth.smartwealth_backend.service.holding.UserHoldingService;
 import com.smartwealth.smartwealth_backend.service.user.UserService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,12 +37,16 @@ public class SipMandateServiceImpl implements SipMandateService {
     private final SipMandateRepository sipMandateRepository;
     private final UserService userService;
     private final SchemePlanRepository schemePlanRepository;
+    private final UserHoldingService userHoldingService;
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public SipMandateResponse createSip(String customerId, CreateSipMandateRequest request) {
         Long userId = getUserId(customerId);
+        Long holdingId = getHoldingId(request, userId);
+
         log.info("Creating SIP mandate for userId: {}, request: {}", userId, request);
+
         validateCreateRequest(request);
 
         OffsetDateTime now = OffsetDateTime.now(ZoneId.of("Asia/Kolkata"));
@@ -49,6 +58,7 @@ public class SipMandateServiceImpl implements SipMandateService {
         SipMandate sip = SipMandate.builder()
                 .userId(userId)
                 .planId(request.getPlanId())
+                .holdingId(holdingId)
                 .sipAmount(request.getSipAmount())
                 .sipDay(request.getSipDay())
                 .startDate(startDateTime.toLocalDate())
@@ -69,6 +79,28 @@ public class SipMandateServiceImpl implements SipMandateService {
         log.info("SIP mandate successfully created with id: {}", sip.getSipMandateId());
 
         return SipMandateResponse.fromEntity(sip);
+    }
+
+    @Nullable
+    private Long getHoldingId(CreateSipMandateRequest request, Long userId) {
+        Long holdingId = null;
+
+        if (request.getFolioNumber() != null && !request.getFolioNumber().isBlank()) {
+
+            UserHoldingProjection holding = userHoldingService
+                    .getHoldingFromFolioNumber(request.getFolioNumber(), userId);
+
+            if (holding == null) {
+                throw new IllegalArgumentException("Invalid folio number");
+            }
+
+            if (!holding.getPlanId().equals(request.getPlanId())) {
+                throw new IllegalArgumentException("Folio does not belong to selected plan");
+            }
+
+            holdingId = holding.getHoldingId();
+        }
+        return holdingId;
     }
 
     @Override

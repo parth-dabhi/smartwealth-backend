@@ -69,6 +69,7 @@ public class SipExecutionServiceImpl implements SipExecutionService{
                     .userId(sip.getUserId())
                     .planId(sip.getPlanId())
                     .sipMandateId(sip.getSipMandateId())
+                    .holdingId(sip.getHoldingId())
                     .investmentType(InvestmentType.BUY)
                     .investmentMode(InvestmentMode.SIP)
                     .amount(sip.getSipAmount())

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public interface UserHoldingPortfolioProjection {
 
     Long getHoldingId();
+    String getFolioNumber();
     Integer getPlanId();
 
     BigDecimal getTotalUnits();

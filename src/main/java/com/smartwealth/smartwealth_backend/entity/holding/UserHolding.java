@@ -7,16 +7,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(
-        name = "user_holdings",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_user_plan", columnNames = {"user_id", "plan_id"})
-        },
-        indexes = {
-                @Index(name = "idx_user_holdings_user", columnList = "user_id"),
-                @Index(name = "idx_user_holdings_plan", columnList = "plan_id")
-        }
-)
+@Table(name = "user_holdings")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -27,6 +18,9 @@ public class UserHolding {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "holding_id")
     private Long holdingId;
+
+    @Column(name = "folio_number", nullable = false, length = 20, unique = true, updatable = false)
+    private String folioNumber;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;

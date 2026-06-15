@@ -2,6 +2,7 @@ package com.smartwealth.smartwealth_backend.exception;
 
 import com.smartwealth.smartwealth_backend.dto.response.common.ErrorResponse;
 import com.smartwealth.smartwealth_backend.exception.auth.AuthenticationException;
+import com.smartwealth.smartwealth_backend.exception.goal.GoalNotFoundException;
 import com.smartwealth.smartwealth_backend.exception.mutual_fund.*;
 import com.smartwealth.smartwealth_backend.exception.nav.NavHistoryNotFoundException;
 import com.smartwealth.smartwealth_backend.exception.resource.ResourceAlreadyExistsException;
@@ -276,6 +277,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidInvestmentOrderException(InvalidInvestmentOrderException ex, HttpServletRequest request) {
         log.warn("Invalid investment order: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(GoalNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleGoalNotFoundException(GoalNotFoundException ex, HttpServletRequest request) {
+        log.warn("Goal not found: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {

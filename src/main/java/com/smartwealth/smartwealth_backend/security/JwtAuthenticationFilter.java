@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -30,16 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = null;
-
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("ACCESS_TOKEN".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                }
-            }
-        } else {
-            token = extractToken(request);
+        // Prefer explicit Authorization header for API clients.
+        // Fall back to ACCESS_TOKEN cookie only when header is absent.
+        String token = extractToken(request);
+        if (token == null) {
+            token = extractTokenFromCookie(request);
         }
 
         if (token != null && tokenProvider.validateAccessToken(token)) {
@@ -72,5 +68,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return (header != null && header.startsWith("Bearer "))
                 ? header.substring(7)
                 : null;
+    }
+
+    private String extractTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return null;
+        }
+
+        for (Cookie cookie : request.getCookies()) {
+            if ("ACCESS_TOKEN".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
     }
 }

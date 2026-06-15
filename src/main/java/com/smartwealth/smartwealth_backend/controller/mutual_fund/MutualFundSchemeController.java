@@ -28,7 +28,7 @@ public class MutualFundSchemeController {
             @RequestParam(required = false) Integer optionTypeId,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10000000") int size
+            @RequestParam(defaultValue = "20") int size
     ) {
         log.info(
                 "Received request to get schemes with filters " +

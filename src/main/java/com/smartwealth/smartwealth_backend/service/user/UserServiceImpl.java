@@ -10,14 +10,20 @@ import com.smartwealth.smartwealth_backend.exception.resource.ResourceNotFoundEx
 import com.smartwealth.smartwealth_backend.repository.user.UserRepository;
 import com.smartwealth.smartwealth_backend.repository.wallet.WalletRepository;
 import com.smartwealth.smartwealth_backend.repository.user.projection.UserEligibilityProjection;
+import com.smartwealth.smartwealth_backend.service.notification.UserNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +34,8 @@ public class UserServiceImpl implements UserService {
     private final WalletRepository walletRepository;
     private final CustomerIdGeneratorService customerIdGenerator;
     private final PasswordEncoder passwordEncoder;
+    private final RiskProfileService riskProfileService;
+    private final UserNotificationService userNotificationService;
 
     @Override
     @Transactional(
@@ -44,7 +52,7 @@ public class UserServiceImpl implements UserService {
         // manually set default values - double safety
         user.setRole(UserRole.USER);
         user.setKycStatus(KycStatus.PENDING);
-        user.setRiskProfile(RiskProfile.MODERATE);
+        user.setRiskProfileId(3); // Default risk profile - Moderate
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setCustomerId(customerIdGenerator.generateCustomerId()); // Generate Customer ID - db call
 
@@ -58,7 +66,10 @@ public class UserServiceImpl implements UserService {
             walletRepository.save(wallet);
             log.info("Wallet created for userId={} walletId={}", savedUser.getId(), wallet.getId());
 
-            return UserAuthResponse.toResponse(savedUser, null);
+            // Send welcome email asynchronously — must be AFTER transaction commits
+            userNotificationService.sendWelcomeEmail(savedUser);
+
+            return UserAuthResponse.toResponse(savedUser, getRiskProfileName(savedUser.getRiskProfileId()), null);
         } catch (DataIntegrityViolationException ex) {
             throw new ResourceAlreadyExistsException("User with provided details already exists.");
         }
@@ -89,20 +100,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(timeout = 5)
-    public void updateRiskProfile(String customerId, RiskProfile riskProfile) {
+    public void updateRiskProfile(String customerId, Integer riskProfileId) {
 
-        log.info("Updating risk profile for customerId={}, newRiskProfile={}", customerId, riskProfile);
+        log.info("Updating risk profile for customerId={}, newRiskProfileId={}", customerId, riskProfileId);
 
         User user = userRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Idempotent-safe
-        if (user.getRiskProfile() == riskProfile) {
-            log.info("Risk profile already set to {} for customerId={}", riskProfile, customerId);
+        if (Objects.equals(user.getRiskProfileId(), riskProfileId)) {
+            log.info("Risk profile already set to {} for customerId={}", riskProfileId, customerId);
             return;
         }
 
-        user.setRiskProfile(riskProfile);
+        user.setRiskProfileId(riskProfileId);
         userRepository.save(user);
 
         log.info("Risk profile updated successfully for customerId={}", customerId);
@@ -123,5 +134,9 @@ public class UserServiceImpl implements UserService {
         log.info("Fetching user eligibility by customerId={}", userId);
         return userRepository.findEligibilityByCustomerId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    public String getRiskProfileName(Integer riskProfileId) {
+        return riskProfileService.getById(riskProfileId).getName();
     }
 }

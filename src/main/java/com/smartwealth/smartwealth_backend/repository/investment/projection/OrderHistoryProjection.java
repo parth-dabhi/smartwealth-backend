@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 
 public interface OrderHistoryProjection {
     Long getInvestmentOrderId();
+    String getFolioNumber();
     String getPlanName();
     String getInvestmentType();
     String getInvestmentMode();

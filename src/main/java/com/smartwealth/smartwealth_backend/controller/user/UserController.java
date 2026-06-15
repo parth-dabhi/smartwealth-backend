@@ -39,7 +39,7 @@ public class UserController {
     public ResponseEntity<Void> updateRiskProfile(@Valid @RequestBody UserRiskProfileUpdateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String customerId = authentication.getName(); // customerId set by JWT filter
-        userService.updateRiskProfile(customerId, request.getRiskProfile());
+        userService.updateRiskProfile(customerId, request.getRiskProfileId());
         return ResponseEntity.noContent().build();
     }
 }

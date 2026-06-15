@@ -13,6 +13,7 @@ import com.smartwealth.smartwealth_backend.repository.user.UserRepository;
 import com.smartwealth.smartwealth_backend.repository.user.projection.AdminUserListProjection;
 import com.smartwealth.smartwealth_backend.repository.user.specification.AdminUserSpecification;
 import com.smartwealth.smartwealth_backend.api.ApiPaths;
+import com.smartwealth.smartwealth_backend.service.notification.UserNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,9 @@ import java.util.Map;
 public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserRepository userRepository;
+    private final RiskProfileService riskProfileService;
+    private final UserNotificationService userNotificationService;
+
     private static final String PAGED_ADMIN_USERS_URL = ApiPaths.API_ADMIN_USERS + "?page=%d&size=%d";
 
     @Override
@@ -130,7 +134,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                         new ResourceNotFoundException("User not found")
                 );
 
-        return AdminUserDetailResponse.from(user);
+        return AdminUserDetailResponse.from(user, getRiskProfileName(user.getRiskProfileId()));
     }
 
     @Override
@@ -164,6 +168,16 @@ public class AdminUserServiceImpl implements AdminUserService {
                 "KYC updated successfully customerId={}, from {} to {}, remark={}",
                 customerId, current, newStatus, remark
         );
+
+        // Notify user — only for VERIFIED and REJECTED
+        userNotificationService.sendKycStatusEmail(
+                user.getEmail(),
+                user.getFullName(),
+                user.getCustomerId(),
+                newStatus,
+                remark,
+                user.getUpdatedAt()
+        );
     }
 
     /*
@@ -182,5 +196,10 @@ public class AdminUserServiceImpl implements AdminUserService {
             case REJECTED -> next == KycStatus.VERIFIED;
             case VERIFIED -> false;
         };
+    }
+
+    private String getRiskProfileName(Integer riskProfileId) {
+        if (riskProfileId == null) return null;
+        return riskProfileService.getById(riskProfileId).getName();
     }
 }

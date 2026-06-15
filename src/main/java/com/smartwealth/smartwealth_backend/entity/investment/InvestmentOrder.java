@@ -39,6 +39,9 @@ public class InvestmentOrder {
     @Column(name = "sip_mandate_id")
     private Long sipMandateId;
 
+    @Column(name = "holding_id")
+    private Long holdingId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "investment_type", nullable = false, length = 20)
     private InvestmentType investmentType; // BUY, SELL

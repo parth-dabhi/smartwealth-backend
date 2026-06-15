@@ -4,7 +4,6 @@ import com.smartwealth.smartwealth_backend.dto.response.user.AddressResponse;
 import com.smartwealth.smartwealth_backend.entity.user.User;
 import com.smartwealth.smartwealth_backend.entity.enums.Gender;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
-import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import lombok.*;
 
@@ -30,14 +29,14 @@ public class UserAuthResponse {
     private AddressResponse address;
     private UserRole role;
     private KycStatus kycStatus;
-    private RiskProfile riskProfile;
+    private String riskProfile;
     private boolean isActive;
     private String lastLoginAt;
 
     private static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
     private static final DateTimeFormatter IST_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
 
-    public static UserAuthResponse toResponse(User user, OffsetDateTime lastLoginAt) {
+    public static UserAuthResponse toResponse(User user, String riskProfile, OffsetDateTime lastLoginAt) {
 
         String formattedLastLogin = null;
 
@@ -56,7 +55,7 @@ public class UserAuthResponse {
                 .address(AddressResponse.fromEntity(user.getAddress()))
                 .role(user.getRole())
                 .kycStatus(user.getKycStatus())
-                .riskProfile(user.getRiskProfile())
+                .riskProfile(riskProfile)
                 .isActive(user.isActive())
                 .lastLoginAt(formattedLastLogin)
                 .build();

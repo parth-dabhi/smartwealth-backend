@@ -10,6 +10,8 @@ import java.util.List;
 public interface PortfolioService {
     PortfolioSummaryResponse getPortfolio(String customerId);
     FamilyPortfolioSummaryResponse getFamilyPortfolio(String viewerCustomerId); // // Get combined portfolio (Personal + All accessible family members)
-    PlanPortfolioResponse getPlanPortfolio(String customerId, Integer planId);
-    List<HoldingTransactionResponse> getHoldingTransactions(String customerId, Integer planId);
+    PlanPortfolioResponse getPlanPortfolio(String customerId, String folioNumber);
+    PlanPortfolioResponse getPlanPortfolio(String customerId, Long holdingId);
+    List<HoldingTransactionResponse> getHoldingTransactions(String customerId, String folioNumber);
+    List<String> getFoliosForPlanOfUser(String customerId, Integer planId);
 }

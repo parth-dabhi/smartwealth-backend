@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public interface NavHistoryRepository extends JpaRepository<NavHistory, Long> {
             @Param("navValue") BigDecimal navValue
     );
 
+    @Transactional
     @Modifying
     @Query(value = """
     INSERT INTO nav_history (plan_id, nav_date, nav_value)
@@ -141,4 +143,75 @@ public interface NavHistoryRepository extends JpaRepository<NavHistory, Long> {
             @Param("navDate") LocalDate navDate,
             @Param("planIds") Set<Integer> planIds
     );
+
+    // NAV ANCHORS  —  used for nightly return + score recalculation
+    /**
+     * Step 1 of nightly job.
+     *
+     * Refreshes nav_anchors table — one row per plan — with 4 anchor NAV values:
+     *   nav_today  : most recent NAV in nav_history
+     *   nav_1y_ago : closest NAV on or before (today - 1 year)
+     *   nav_3y_ago : closest NAV on or before (today - 3 years)
+     *   nav_5y_ago : closest NAV on or before (today - 5 years)
+     *
+     * Uses LATERAL joins so each subquery runs once per plan — much faster
+     * than a correlated subquery in a SET clause.
+     *
+     * ON CONFLICT DO UPDATE means this is safe to run repeatedly.
+     */
+    @Modifying
+    @Transactional
+    @Query(value = """
+        INSERT INTO nav_anchors (plan_id, nav_today, nav_1y_ago, nav_3y_ago, nav_5y_ago, anchored_on)
+        SELECT
+            p.plan_id,
+            n0.nav_value   AS nav_today,
+            n1.nav_value   AS nav_1y_ago,
+            n3.nav_value   AS nav_3y_ago,
+            n5.nav_value   AS nav_5y_ago,
+            :latestNavDate AS anchored_on
+        FROM scheme_plans p
+ 
+        -- NAV on exactly the latest real trading day
+        LEFT JOIN LATERAL (
+            SELECT nav_value FROM nav_history
+            WHERE plan_id = p.plan_id
+              AND nav_date = :latestNavDate
+            LIMIT 1
+        ) n0 ON true
+ 
+        -- closest NAV on/before (latestNavDate - 1 year)
+        LEFT JOIN LATERAL (
+            SELECT nav_value FROM nav_history
+            WHERE plan_id = p.plan_id
+              AND nav_date <= CAST(:latestNavDate AS date) - INTERVAL '1 year'
+            ORDER BY nav_date DESC
+            LIMIT 1
+        ) n1 ON true
+ 
+        -- closest NAV on/before (latestNavDate - 3 years)
+        LEFT JOIN LATERAL (
+            SELECT nav_value FROM nav_history
+            WHERE plan_id = p.plan_id
+              AND nav_date <= CAST(:latestNavDate AS date) - INTERVAL '3 years'
+            ORDER BY nav_date DESC
+            LIMIT 1
+        ) n3 ON true
+ 
+        -- closest NAV on/before (latestNavDate - 5 years)
+        LEFT JOIN LATERAL (
+            SELECT nav_value FROM nav_history
+            WHERE plan_id = p.plan_id
+              AND nav_date <= CAST(:latestNavDate AS date) - INTERVAL '5 years'
+            ORDER BY nav_date DESC
+            LIMIT 1
+        ) n5 ON true
+        ON CONFLICT (plan_id) DO UPDATE SET
+            nav_today   = EXCLUDED.nav_today,
+            nav_1y_ago  = EXCLUDED.nav_1y_ago,
+            nav_3y_ago  = EXCLUDED.nav_3y_ago,
+            nav_5y_ago  = EXCLUDED.nav_5y_ago,
+            anchored_on = EXCLUDED.anchored_on
+    """, nativeQuery = true)
+    void refreshNavAnchors(@Param("latestNavDate") LocalDate latestNavDate);
 }

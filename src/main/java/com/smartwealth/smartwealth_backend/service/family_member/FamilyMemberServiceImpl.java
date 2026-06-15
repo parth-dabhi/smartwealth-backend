@@ -6,11 +6,13 @@ import com.smartwealth.smartwealth_backend.dto.response.family_member.PendingFam
 import com.smartwealth.smartwealth_backend.entity.enums.FamilyRequestStatus;
 import com.smartwealth.smartwealth_backend.entity.family_member.FamilyMember;
 import com.smartwealth.smartwealth_backend.entity.family_member.FamilyMemberRequest;
+import com.smartwealth.smartwealth_backend.exception.resource.ResourceNotFoundException;
 import com.smartwealth.smartwealth_backend.repository.family_member.FamilyMemberRepository;
 import com.smartwealth.smartwealth_backend.repository.family_member.FamilyMemberRequestRepository;
 import com.smartwealth.smartwealth_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -156,23 +158,54 @@ public class FamilyMemberServiceImpl implements FamilyMemberService {
                 .map(PendingFamilyResponseDto::fromProjection).toList();
     }
 
+    @Override
     @Transactional
-    public FamilyActionResponse revokeAccess(String ownerCustomerId, String viewerCustomerId) {
+    public FamilyActionResponse removeAccessibleFamilyMember(Long familyMemberId) {
+        if (!familyMemberRepository.existsById(familyMemberId)) {
+            log.warn("Family member not found for remove. familyMemberId={}", familyMemberId);
+            throw new ResourceNotFoundException("Family member not found");
+        }
 
-        Long ownerId = userService.getUserIdByCustomerId(ownerCustomerId);
-        Long viewerId = userService.getUserIdByCustomerId(viewerCustomerId);
+        familyMemberRepository.deleteById(familyMemberId);
 
-        log.warn("Revoking family access. owner={}, viewer={}", ownerId, viewerId);
-        familyMemberRepository.deleteByViewerIdAndOwnerId(viewerId, ownerId);
-
-        return success("ACCESS_REVOKED", "Family access revoked successfully");
+        log.info("Revoked family access. familyMemberId={}", familyMemberId);
+        return success("REMOVED_FAMILY_MEMBER", "Family member access removed successfully");
     }
 
     @Override
-    public List<FamilyMemberListResponse> getAllFamilyMember(String viewerCustomerId) {
+    @Transactional
+    public FamilyActionResponse revokeFamilyMemberAccessToMe(Long familyMemberId) {
+        if (!familyMemberRepository.existsById(familyMemberId)) {
+            log.warn("Family member not found for revoke. familyMemberId={}", familyMemberId);
+            throw new ResourceNotFoundException("Family member not found");
+        }
+
+        familyMemberRepository.deleteById(familyMemberId);
+
+        log.info("Revoked family member's access to me. familyMemberId={}", familyMemberId);
+        return success("REVOKED_ACCESS_TO_ME", "Family member's access to you revoked successfully");
+    }
+
+    // means i have access to other family members, so i can see them in the list
+    @Override
+    public List<FamilyMemberListResponse> getAllFamilyMemberWhoIHaveAccess(String viewerCustomerId) {
         Long viewerId = userService.getUserIdByCustomerId(viewerCustomerId);
         log.info("Fetching all family members for ownerCustomerId={}", viewerCustomerId);
         return familyMemberRepository.findAllFamilyMembersByViewerId(viewerId)
+                .stream()
+                .map(fm -> new FamilyMemberListResponse(
+                        fm.getFamilyMemberId(),
+                        fm.getMemberName()
+                ))
+                .toList();
+    }
+
+    // means i am the owner, so i can see all the viewers who have access to me
+    @Override
+    public List<FamilyMemberListResponse> getAllFamilyMembersWhoHaveAccessToMe(String ownerCustomerId) {
+        Long ownerId = userService.getUserIdByCustomerId(ownerCustomerId);
+        log.info("Fetching all family members who have access for ownerCustomerId={}", ownerCustomerId);
+        return familyMemberRepository.findAllFamilyMembersByOwnerId(ownerId)
                 .stream()
                 .map(fm -> new FamilyMemberListResponse(
                         fm.getFamilyMemberId(),

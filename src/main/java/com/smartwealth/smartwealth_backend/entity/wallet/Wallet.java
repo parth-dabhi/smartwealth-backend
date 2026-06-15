@@ -25,7 +25,7 @@ public class Wallet {
     @Column(name = "user_id", nullable = false, updatable = false, unique = true)
     private Long userId;
 
-    // Available balance (can be spent)
+    // Available balance (can be spent)locked_balance
     @Column(name = "balance", nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
 

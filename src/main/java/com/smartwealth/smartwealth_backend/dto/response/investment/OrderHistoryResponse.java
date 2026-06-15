@@ -16,6 +16,7 @@ import java.time.OffsetDateTime;
 public class OrderHistoryResponse {
 
     private Long investmentOrderId;
+    private String folioNumber;
     private String planName;
 
     private String investmentType;   // BUY | SELL

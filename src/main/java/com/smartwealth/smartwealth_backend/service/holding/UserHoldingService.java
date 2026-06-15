@@ -2,6 +2,7 @@ package com.smartwealth.smartwealth_backend.service.holding;
 
 import com.smartwealth.smartwealth_backend.entity.enums.InvestmentMode;
 import com.smartwealth.smartwealth_backend.entity.investment.InvestmentOrder;
+import com.smartwealth.smartwealth_backend.repository.holding.projection.UserHoldingProjection;
 import com.smartwealth.smartwealth_backend.repository.nav.projection.PlanNavProjection;
 import com.smartwealth.smartwealth_backend.repository.holding.projection.UserHoldingSellProjection;
 
@@ -9,7 +10,7 @@ import java.math.BigDecimal;
 
 public interface UserHoldingService {
 
-    void updateUserHoldingsForBuy(
+    Long updateUserHoldingsForBuy(
             InvestmentOrder order,
             BigDecimal unitsToBuy,
             PlanNavProjection navLatest,
@@ -24,11 +25,6 @@ public interface UserHoldingService {
             InvestmentMode investmentMode
     );
 
-    UserHoldingSellProjection getHoldingForSell(
-            Long userId,
-            Integer planId
-    );
-
     BigDecimal getRedeemAmount(
             BigDecimal unitsToSell,
             BigDecimal navLatestValue
@@ -40,8 +36,12 @@ public interface UserHoldingService {
     );
 
     void validateSufficientHoldings(
-            Long userId,
-            Integer planId,
+            Long holdingId,
             BigDecimal unitsToSell
+    );
+
+    UserHoldingProjection getHoldingFromFolioNumber(
+            String folioNumber,
+            Long userId
     );
 }

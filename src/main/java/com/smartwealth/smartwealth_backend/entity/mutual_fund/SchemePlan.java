@@ -11,7 +11,8 @@ import java.time.OffsetDateTime;
 @Table(
         name = "scheme_plans",
         indexes = {
-                @Index(name = "idx_plan_scheme_id", columnList = "scheme_id")
+                @Index(name = "idx_plan_scheme_id", columnList = "scheme_id"),
+                @Index(name = "idx_scheme_plans_score", columnList = "score")
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -57,6 +58,10 @@ public class SchemePlan {
 
     @Column(name = "return_5y", precision = 10, scale = 4)
     private BigDecimal return5y;
+
+    // Composite ranking score — recalculated nightly from nav_anchors.
+    @Column(name = "score", precision = 10, scale = 4)
+    private BigDecimal score;
 
     @Column(name = "is_sip_allowed", nullable = false)
     private Boolean isSipAllowed = false;

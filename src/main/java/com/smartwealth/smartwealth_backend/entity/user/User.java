@@ -2,7 +2,6 @@ package com.smartwealth.smartwealth_backend.entity.user;
 
 import com.smartwealth.smartwealth_backend.entity.enums.Gender;
 import com.smartwealth.smartwealth_backend.entity.enums.KycStatus;
-import com.smartwealth.smartwealth_backend.entity.enums.RiskProfile;
 import com.smartwealth.smartwealth_backend.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -68,10 +67,8 @@ public class User {
     @Column(name="kyc_status", nullable=false)
     private KycStatus kycStatus = KycStatus.PENDING;
 
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    @Column(name="risk_profile", nullable=false)
-    private RiskProfile riskProfile = RiskProfile.MODERATE;
+    @Column(name="risk_profile_id", nullable=false)
+    private Integer riskProfileId;
 
     // Audit Fields
 

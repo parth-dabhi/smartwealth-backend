@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface MutualFundSchemeRepository extends JpaRepository<MutualFundScheme, Integer> {
     @Query(value = """
             SELECT DISTINCT
@@ -51,4 +53,16 @@ public interface MutualFundSchemeRepository extends JpaRepository<MutualFundSche
             @Param("search") String search,
             Pageable pageable
     );
+
+    @Query("""
+    SELECT s.schemeId
+    FROM MutualFundScheme s
+    WHERE s.assetId = :assetId
+    ORDER BY s.schemeId
+""")
+    List<Integer> findTopSchemesByAsset(
+            @Param("assetId") Integer assetId,
+            @Param("duration") Integer duration
+    );
+
 }

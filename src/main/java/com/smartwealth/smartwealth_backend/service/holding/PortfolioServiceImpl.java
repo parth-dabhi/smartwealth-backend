@@ -74,18 +74,26 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     // PLAN PORTFOLIO
     @Override
-    public PlanPortfolioResponse getPlanPortfolio(String customerId, Integer planId) {
+    public PlanPortfolioResponse getPlanPortfolio(String customerId, String folioNumber) {
         Long userId = getUserId(customerId);
-        UserHoldingPortfolioProjection holding = getHoldingByUserAndPlan(userId, planId);
+        UserHoldingPortfolioProjection holding = getHoldingByUserIdAndFolioNumber(userId, folioNumber);
+        return buildPlanPortfolioResponse(holding);
+    }
+
+    @Override
+    public PlanPortfolioResponse getPlanPortfolio(String customerId, Long holdingId) {
+        Long userId = getUserId(customerId);
+        UserHoldingPortfolioProjection holding = getHoldingByUserIdAndHoldingId(userId, holdingId);
         return buildPlanPortfolioResponse(holding);
     }
 
     //  TRANSACTION HISTORY
     @Override
-    public List<HoldingTransactionResponse> getHoldingTransactions(String customerId, Integer planId) {
+    public List<HoldingTransactionResponse> getHoldingTransactions(String customerId, String folioNumber) {
         Long userId = getUserId(customerId);
-        UserHoldingPortfolioProjection holding = getHoldingByUserAndPlan(userId, planId);
-        return buildTransactionList(holding.getHoldingId());
+        Long holdingId = userHoldingRepository.findHoldingIdByFolioNumber(folioNumber, userId)
+                .orElseThrow(() -> new HoldingNotFoundException("No holding found for given folio number"));
+        return buildTransactionList(holdingId);
     }
 
     // PRIVATE BUILDER METHODS
@@ -167,6 +175,7 @@ public class PortfolioServiceImpl implements PortfolioService {
         return PlanPortfolioResponse.builder()
                 .planId(holding.getPlanId())
                 .planName(holding.getPlanName())
+                .folioNumber(holding.getFolioNumber())
                 .amcName(holding.getAmcName())
                 .assetName(holding.getAssetName())
                 .categoryName(holding.getCategoryName())
@@ -235,6 +244,7 @@ public class PortfolioServiceImpl implements PortfolioService {
                     PortfolioHoldingResponse.builder()
                             .planId(h.getPlanId())
                             .planName(h.getPlanName())
+                            .folioNumber(h.getFolioNumber())
                             .amcName(h.getAmcName())
                             .assetName(h.getAssetName())
                             .categoryName(h.getCategoryName())
@@ -333,6 +343,12 @@ public class PortfolioServiceImpl implements PortfolioService {
         return assetAllocations;
     }
 
+    @Override
+    public List<String> getFoliosForPlanOfUser(String customerId, Integer planId) {
+        Long userId = getUserId(customerId);
+        return userHoldingRepository.findFoliosByUserAndPlan(userId, planId);
+    }
+
     // UTILITY METHODS
 
     private Long getUserId(String customerId) {
@@ -344,8 +360,13 @@ public class PortfolioServiceImpl implements PortfolioService {
                 .orElseThrow(() -> new HoldingNotFoundException("No holdings found for user"));
     }
 
-    private UserHoldingPortfolioProjection getHoldingByUserAndPlan(Long userId, Integer planId) {
-        return userHoldingRepository.findByUserAndPlan(userId, planId)
+    private UserHoldingPortfolioProjection getHoldingByUserIdAndFolioNumber(Long userId, String folioNumber) {
+        return userHoldingRepository.findByUserIdAndFolioNumber(userId, folioNumber)
+                .orElseThrow(() -> new HoldingNotFoundException("No holding found"));
+    }
+
+    private UserHoldingPortfolioProjection getHoldingByUserIdAndHoldingId(Long userId, Long holdingId) {
+        return userHoldingRepository.findByUserIdAndHoldingId(userId, holdingId)
                 .orElseThrow(() -> new HoldingNotFoundException("No holding found"));
     }
 

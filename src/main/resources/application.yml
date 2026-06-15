@@ -2,6 +2,18 @@ spring:
   application:
     name: smartwealth-backend
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   datasource:
     driver-class-name: org.postgresql.Driver
 
@@ -28,6 +40,9 @@ jwt:
 smartwealth:
   limits:
     max-wallet-balance: 10000000.00
+  mail:
+    from: ${MAIL_USERNAME}
+    from-name: SmartWealth
 
 idempotency:
   ttl: ${IDEMPOTENCY_TTL_MINUTES:5}m
@@ -35,3 +50,7 @@ idempotency:
 sip:
   failure:
     max-attempts: 3
+
+logging:
+  pattern:
+    console: "%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %msg%n"

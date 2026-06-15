@@ -24,4 +24,16 @@ public interface FamilyMemberRepository extends JpaRepository<FamilyMember, Long
         ORDER BY u.fullName ASC
     """)
     List<FamilyMemberListProjection> findAllFamilyMembersByViewerId(Long viewerId);
+
+    @Query("""
+        SELECT
+            fm.familyMemberId AS familyMemberId,
+            fm.viewerId AS viewerId,
+            u.fullName AS memberName
+        FROM FamilyMember fm
+        JOIN User u ON u.id = fm.viewerId
+        WHERE fm.ownerId = :ownerId
+        ORDER BY u.fullName ASC
+    """)
+    List<FamilyMemberListProjection> findAllFamilyMembersByOwnerId(Long ownerId);
 }
